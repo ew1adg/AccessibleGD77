@@ -146,28 +146,6 @@ static bool reorderingChannels=false;
 
 static menuStatus_t menuChannelExitStatus = MENU_STATUS_SUCCESS;
 static menuStatus_t menuQuickChannelExitStatus = MENU_STATUS_SUCCESS;
-<<<<<<< HEAD
-struct DualWatchChannelData_t
-{
-bool dualWatchActive;
-int16_t initialChannelIndex; // When Dual Watch is activated, this is the index of the channel on which it is activated.
-int16_t currentChannelIndex; // the index of the channel the user has switched to after activating Dual Watch.
-int16_t dualWatchChannelIndex; // When Dual Watch is active, this index toggles between the above two and holds the index of the channel currently being monitored.
-uint16_t dualWatchPauseCountdownTimer;
-bool allowedToAnnounceChannelDetails;
-bool restartDualWatch;
-} dualWatchChannelData;
-
-static bool ToggleDualWatchChannelIndex()
-{
-	if (dualWatchChannelData.initialChannelIndex == dualWatchChannelData.currentChannelIndex)
-		return false; // User hasn't moved away from the initial channel yet.
-
-	if (dualWatchChannelData.dualWatchChannelIndex == dualWatchChannelData.initialChannelIndex)
-		dualWatchChannelData.dualWatchChannelIndex=dualWatchChannelData.currentChannelIndex;
-	else
-		dualWatchChannelData.dualWatchChannelIndex=dualWatchChannelData.initialChannelIndex;
-=======
 static uint16_t repeaterOffsetDisplayTimeout=0;
 
 struct DualWatchChannelData_t
@@ -213,21 +191,10 @@ static bool ToggleDualWatchChannelIndex()
 		dualWatchChannelData.dualWatchChannelIndex=dualWatchChannelData.watchChannelIndex;
 		dualWatchChannelData.dualWatchChannelIndexIsRelativeToAllChannelsZone=true;
 	}
->>>>>>> development
 
 	return true;
 }
 
-<<<<<<< HEAD
-static void SetNextChannelIndexAndData(uint16_t channelIndex)
-{
-	nextChannelIndex =channelIndex;
-
-	if (CODEPLUG_ZONE_IS_ALLCHANNELS(currentZone))
-		codeplugChannelGetDataForIndex(nextChannelIndex, &channelNextChannelData);
-	else
-		codeplugChannelGetDataForIndex(currentZone.channels[nextChannelIndex], &channelNextChannelData);
-=======
 static void SetNextChannelIndexAndData(uint16_t channelIndex, bool indexIsRelativeToAllChannelsZone)
 {
 	// nextChannelIndex is expected to be relative to the current zone.
@@ -248,7 +215,6 @@ static void SetNextChannelIndexAndData(uint16_t channelIndex, bool indexIsRelati
 		codeplugChannelGetDataForIndex(channelIndex, &channelNextChannelData);
 	else
 		codeplugChannelGetDataForIndex(currentZone.channels[channelIndex], &channelNextChannelData);
->>>>>>> development
 
 	nextChannelReady = true;
 }
@@ -270,23 +236,11 @@ static bool DoDualWatchScan()
 	return true; // User hasn't yet moved away from the initial channel, but no other scan mode should be handled.
 	// At this point we have set the dualWatchChannelData.dualWatchChannelIndex to the other channel to watch.
 	// Now load it's data.
-<<<<<<< HEAD
-	SetNextChannelIndexAndData(dualWatchChannelData.dualWatchChannelIndex);
-=======
 	SetNextChannelIndexAndData(dualWatchChannelData.dualWatchChannelIndex, dualWatchChannelData.dualWatchChannelIndexIsRelativeToAllChannelsZone);
->>>>>>> development
 
 	return true;
 }
 
-<<<<<<< HEAD
-static void EnsureDualWatchReturnsToCurrent()
-{
-	// return to the last channel selected by the user.
-	SetNextChannelIndexAndData(dualWatchChannelData.currentChannelIndex);
-	scanApplyNextChannel();
-}
-=======
 #if ! defined(PLATFORM_GD77S) // GD77S handle voice prompts on its own
 static void EnsureDualWatchReturnsToCurrent()
 {
@@ -296,49 +250,17 @@ static void EnsureDualWatchReturnsToCurrent()
 	scanApplyNextChannel();
 }
 #endif // ! defined(PLATFORM_GD77S) // GD77S handle voice prompts on its own
->>>>>>> development
 
 static void InitDualWatchData()
 {
 	memset(&dualWatchChannelData, 0, sizeof(dualWatchChannelData));
 }
 
-<<<<<<< HEAD
-=======
 #if ! defined(PLATFORM_GD77S) // GD77S handle voice prompts on its own
->>>>>>> development
 static void AnnounceDualWatchChannels(bool immediately)
 {
 	voicePromptsInit();
 
-<<<<<<< HEAD
-	int dualWatchChannelNumber =dualWatchChannelData.initialChannelIndex;
-	int dualWatchCurrentChannelNumber=dualWatchChannelData.currentChannelIndex;
-	if (!CODEPLUG_ZONE_IS_ALLCHANNELS(currentZone))
-	{
-		dualWatchChannelNumber++; // for announcement, zone channels are 0-based, allChannels are 1-based.
-		dualWatchCurrentChannelNumber++;
-	}
-	voicePromptsAppendLanguageString(&currentLanguage->dual_watch);
-	char dwChannels[17]="\0";
-	sprintf(dwChannels, "%d, %d", dualWatchCurrentChannelNumber, dualWatchChannelNumber);
-	voicePromptsAppendString(dwChannels);
-	if (immediately)
-		voicePromptsPlay();
-}
-
-static void StartDualWatch(uint16_t initialChannelIndex, uint16_t startDelay, bool restarting)
-{
-	dualWatchChannelData.dualWatchActive=true;
-	dualWatchChannelData.allowedToAnnounceChannelDetails=true;
-		// Set all to the initial channel.
-		//When the user chooses a new current channel, the dual watch will begin automatically.
-	dualWatchChannelData.initialChannelIndex = initialChannelIndex;
-	if (!restarting) // do not overwrite current if restarting.
-		dualWatchChannelData.currentChannelIndex = initialChannelIndex;
-	dualWatchChannelData.dualWatchChannelIndex = initialChannelIndex;
-
-=======
 	if (dualWatchChannelData.watchChannelIndex==uiDataGlobal.priorityChannelIndex)
 		voicePromptsAppendLanguageString(&currentLanguage->priorityScan);
 	else
@@ -364,47 +286,12 @@ static void StartDualWatch(uint16_t watchChannelIndex, uint16_t currentChannelIn
 	GetChannelName(watchChannelIndex, true, dualWatchChannelData.watchChannelName, 17);
 	GetChannelName(currentChannelIndex, CODEPLUG_ZONE_IS_ALLCHANNELS(currentZone), dualWatchChannelData.currentChannelName, 17);
 	
->>>>>>> development
 	scanStart(false);
 
 	uiDataGlobal.Scan.scanType = SCAN_TYPE_DUAL_WATCH;
 
-<<<<<<< HEAD
-	nextChannelIndex = dualWatchChannelData.currentChannelIndex;
-	nextChannelReady = false;
-
-	int  currentPowerSavingLevel = rxPowerSavingGetLevel();
-	if (currentPowerSavingLevel > 1)
-	{
-		rxPowerSavingSetLevel(currentPowerSavingLevel -1);
-	}
-	dualWatchChannelData.dualWatchPauseCountdownTimer=startDelay; // give time for initial voice prompt to speak.
-}
-
-static void StopDualWatch(bool returnToCurrentChannel)
-{
-	if (dualWatchChannelData.dualWatchActive==false)
-		return;
-
-	if (returnToCurrentChannel)
-		EnsureDualWatchReturnsToCurrent();
-
-	uiChannelModeStopScanning();
-	InitDualWatchData();
-	rxPowerSavingSetLevel(nonVolatileSettings.ecoLevel);
-}
-
-static void SetDualWatchCurrentChannelIndex(uint16_t currentChannelIndex)
-{// We have to do this because when in Dual Watch, voice prompts from Load Channel are suppressed.
-	dualWatchChannelData.dualWatchPauseCountdownTimer=2000;
-	dualWatchChannelData.allowedToAnnounceChannelDetails=true;
-	dualWatchChannelData.currentChannelIndex=currentChannelIndex;
-	uiDataGlobal.Scan.timer =500; // force scan to continue;
-	}
-=======
 	nextChannelIndex = dualWatchChannelData.watchChannelIndex;
 	nextChannelReady = false;
->>>>>>> development
 
 	int  currentPowerSavingLevel = rxPowerSavingGetLevel();
 	if (currentPowerSavingLevel > 1)
@@ -646,14 +533,10 @@ menuStatus_t uiChannelMode(uiEvent_t *ev, bool isFirstRun)
 				if (dualWatchChannelData.dualWatchPauseCountdownTimer > 0)
 					dualWatchChannelData.dualWatchPauseCountdownTimer--;
 				else
-<<<<<<< HEAD
-					StartDualWatch(dualWatchChannelData.initialChannelIndex, 1000, true);
-=======
 				{
 					uint16_t currentChannelIndex= CODEPLUG_ZONE_IS_ALLCHANNELS(currentZone) ? nonVolatileSettings.currentChannelIndexInAllZone : nonVolatileSettings.currentChannelIndexInZone;
 					StartDualWatch(dualWatchChannelData.watchChannelIndex, currentChannelIndex, 1000);
 				}
->>>>>>> development
 			}
 		}
 		else
@@ -810,15 +693,12 @@ static void scanSearchForNextChannel(void)
 {
 	if (DoDualWatchScan())
 		return;
-<<<<<<< HEAD
-=======
 #if  defined(PLATFORM_GD77S) // GD77S vfo scan
 	if (HandleGD77SScanning())
 	{
 		return;
 	}
 #endif
->>>>>>> development
 
 	int channel = 0;
 
@@ -922,10 +802,7 @@ static void scanApplyNextChannel(void)
 	nextChannelReady = false;
 }
 
-<<<<<<< HEAD
-=======
 #if ! defined(PLATFORM_GD77S) // GD77S handle voice prompts on its own
->>>>>>> development
 static bool AnnounceChannelInfoImmediately()
 {
 	int nextMenu = menuSystemGetPreviouslyPushedMenuNumber();
@@ -951,11 +828,7 @@ static bool AllowedToAnnounceChannelInfo(bool loadVoicePromptAnnouncement)
 		if (uiDataGlobal.Scan.active == false)
 			return true;
 
-<<<<<<< HEAD
-		if (uiDataGlobal.Scan.state == SCAN_PAUSED)
-=======
 		if (uiDataGlobal.Scan.state == SCAN_PAUSED || uiDataGlobal.Scan.state == SCAN_SHORT_PAUSED)
->>>>>>> development
 			return true;
 		return false;
 	}
@@ -965,10 +838,7 @@ static bool AllowedToAnnounceChannelInfo(bool loadVoicePromptAnnouncement)
 
 	return dualWatchChannelData.allowedToAnnounceChannelDetails;
 }
-<<<<<<< HEAD
-=======
 #endif // ! defined(PLATFORM_GD77S) // GD77S handle voice prompts on its own
->>>>>>> development
 
 static void loadChannelData(bool useChannelDataInMemory, bool loadVoicePromptAnnouncement)
 {
@@ -1115,11 +985,7 @@ void uiChannelModeUpdateScreen(int txTimeSecs)
 	}
 
 	ucClearBuf();
-<<<<<<< HEAD
-	uiUtilityRenderHeader(dualWatchChannelData.dualWatchActive);
-=======
 	uiUtilityRenderHeader(dualWatchChannelData.dualWatchActive ? (dualWatchChannelData.watchChannelIndex==uiDataGlobal.priorityChannelIndex ? channelPriorityScan :  channelDualWatch) : notScanning);
->>>>>>> development
 
 	switch(uiDataGlobal.displayQSOState)
 	{
@@ -1393,16 +1259,12 @@ static void handleEvent(uiEvent_t *ev)
 			if (uiDataGlobal.Scan.active && dualWatchChannelData.dualWatchActive)
 				AnnounceDualWatchChannels(nonVolatileSettings.audioPromptMode >= AUDIO_PROMPT_MODE_VOICE_LEVEL_1);
 			else
-<<<<<<< HEAD
-				AnnounceChannelSummary(voicePromptsIsPlaying() || (nonVolatileSettings.audioPromptMode == AUDIO_PROMPT_MODE_VOICE_LEVEL_2));
-=======
 				AnnounceChannelSummary((nonVolatileSettings.audioPromptMode <= AUDIO_PROMPT_MODE_VOICE_LEVEL_2), true);
 			return;
 		}
 
 		if (rebuildVoicePromptOnExtraLongSK1(ev))
 		{
->>>>>>> development
 			return;
 		}
 
@@ -1564,11 +1426,7 @@ static void handleEvent(uiEvent_t *ev)
 				{
 					if ((directChannelNumber - 1) < currentZone.NOT_IN_CODEPLUGDATA_numChannelsInZone)
 					{
-<<<<<<< HEAD
-						settingsSet(nonVolatileSettings.currentChannelIndexInZone, (int16_t) (directChannelNumber - 1));
-=======
 						settingsSetCurrentChannelIndexForZone(directChannelNumber - 1, nonVolatileSettings.currentZone);
->>>>>>> development
 						// Save this in the dual watch as the currently selected channel.
 						SetDualWatchCurrentChannelIndex(directChannelNumber - 1);
 						loadChannelData(false, true);
@@ -1603,10 +1461,7 @@ static void handleEvent(uiEvent_t *ev)
 			{
 				StopDualWatch(true); // Ensure dual watch is stopped.
 
-<<<<<<< HEAD
-=======
 				// Assignment for SK2 + #
->>>>>>> development
 				menuSystemPushNewMenu(MENU_CONTACT_QUICKLIST);
 			}
 			else
@@ -1674,8 +1529,6 @@ static void handleEvent(uiEvent_t *ev)
 		}
 		else if (KEYCHECK_SHORTUP(ev->keys, KEY_RED))
 		{
-<<<<<<< HEAD
-=======
 			if (reorderingChannels)
 			{
 				reorderingChannels=false;
@@ -1683,7 +1536,6 @@ static void handleEvent(uiEvent_t *ev)
 				return;
 			}
 
->>>>>>> development
 			if (dualWatchChannelData.dualWatchActive)
 			{
 				StopDualWatch(true); // Ensure dual watch is stopped.
@@ -2067,10 +1919,6 @@ static void handleEvent(uiEvent_t *ev)
 						settingsSet(nonVolatileSettings.currentChannelIndexInAllZone, prevChan);
 						// Set this in the Dual Watch struct as the current channel just selected by the user.
 						SetDualWatchCurrentChannelIndex(prevChan);
-<<<<<<< HEAD
-
-=======
->>>>>>> development
 						if (nonVolatileSettings.currentChannelIndexInAllZone == 1)
 						{
 							menuChannelExitStatus |= (MENU_STATUS_LIST_TYPE | MENU_STATUS_FORCE_FIRST);
@@ -2083,11 +1931,7 @@ static void handleEvent(uiEvent_t *ev)
 					{
 						prevChan = ((nonVolatileSettings.currentChannelIndexInZone + currentZone.NOT_IN_CODEPLUGDATA_numChannelsInZone - 1) % currentZone.NOT_IN_CODEPLUGDATA_numChannelsInZone);
 
-<<<<<<< HEAD
-						settingsSet(nonVolatileSettings.currentChannelIndexInZone, prevChan);
-=======
 						settingsSetCurrentChannelIndexForZone(prevChan, nonVolatileSettings.currentZone);
->>>>>>> development
 						// Set this in the Dual Watch struct as the current channel just selected by the user.
 						SetDualWatchCurrentChannelIndex(prevChan);
 
@@ -2262,11 +2106,7 @@ static void handleUpKey(uiEvent_t *ev)
 			{
 				nextChan = ((nonVolatileSettings.currentChannelIndexInZone + 1) % currentZone.NOT_IN_CODEPLUGDATA_numChannelsInZone);
 
-<<<<<<< HEAD
-				settingsSet(nonVolatileSettings.currentChannelIndexInZone, nextChan);
-=======
 				settingsSetCurrentChannelIndexForZone(nextChan, nonVolatileSettings.currentZone);
->>>>>>> development
 				// Set this in the Dual Watch struct as the current channel just selected by the user.
 				SetDualWatchCurrentChannelIndex(nextChan);
 
@@ -2295,13 +2135,10 @@ enum CHANNEL_SCREEN_QUICK_MENU_ITEMS {  CH_SCREEN_QUICK_MENU_COPY2VFO = 0, CH_SC
 	CH_SCREEN_QUICK_MENU_FILTER_DMR_CC,
 	CH_SCREEN_QUICK_MENU_FILTER_DMR_TS,
 	CH_SCREEN_QUICK_MENU_DUAL_SCAN,
-<<<<<<< HEAD
-=======
 	CH_SCREEN_QUICK_MENU_PRIORITY_SCAN,
 	CH_SCREEN_QUICK_MENU_DEL_FROM_ZONE,
 	CH_SCREEN_QUICK_MENU_DEL_CHANNEL,
 	CH_SCREEN_QUICK_MENU_REORDER_CHANNELS,
->>>>>>> development
 	NUM_CH_SCREEN_QUICK_MENU_ITEMS };// The last item in the list is used so that we automatically get a total number of items in the list
 
 menuStatus_t uiChannelModeQuickMenu(uiEvent_t *ev, bool isFirstRun)
@@ -2430,11 +2267,7 @@ static void updateQuickMenuScreen(bool isFirstRun)
 	char rightSideVar[SCREEN_LINE_BUFFER_SIZE];
 
 	ucClearBuf();
-<<<<<<< HEAD
-	bool settingOption = uiShowQuickKeysChoices(buf, bufferLen,currentLanguage->quick_menu);
-=======
 	bool settingOption = uiShowQuickKeysChoices(buf, SCREEN_LINE_BUFFER_SIZE,currentLanguage->quick_menu);
->>>>>>> development
 
 	for(int i =- 1; i <= 1; i++)
 	{
@@ -2462,11 +2295,7 @@ static void updateQuickMenuScreen(bool isFirstRun)
 					}
 					else
 					{
-<<<<<<< HEAD
-						snprintf(rightSideVar, bufferLen, "%s", ANALOG_FILTER_LEVELS[uiDataGlobal.QuickMenu.tmpAnalogFilterLevel - 1]);
-=======
 						snprintf(rightSideVar, SCREEN_LINE_BUFFER_SIZE, "%s", ANALOG_FILTER_LEVELS[uiDataGlobal.QuickMenu.tmpAnalogFilterLevel - 1]);
->>>>>>> development
 					}
 					break;
 				case CH_SCREEN_QUICK_MENU_FILTER_DMR:
@@ -2477,11 +2306,7 @@ static void updateQuickMenuScreen(bool isFirstRun)
 					}
 					else
 					{
-<<<<<<< HEAD
-						snprintf(rightSideVar, bufferLen, "%s", DMR_DESTINATION_FILTER_LEVELS[uiDataGlobal.QuickMenu.tmpDmrDestinationFilterLevel - 1]);
-=======
 						snprintf(rightSideVar, SCREEN_LINE_BUFFER_SIZE, "%s", DMR_DESTINATION_FILTER_LEVELS[uiDataGlobal.QuickMenu.tmpDmrDestinationFilterLevel - 1]);
->>>>>>> development
 					}
 					break;
 				case CH_SCREEN_QUICK_MENU_FILTER_DMR_CC:
@@ -2495,8 +2320,6 @@ static void updateQuickMenuScreen(bool isFirstRun)
 				case CH_SCREEN_QUICK_MENU_DUAL_SCAN:
 					rightSideConst = (char * const *)&currentLanguage->dual_watch;
 					break;
-<<<<<<< HEAD
-=======
 				case CH_SCREEN_QUICK_MENU_PRIORITY_SCAN:
 					rightSideConst = (char * const *)&currentLanguage->priorityScan;
 					break;
@@ -2509,35 +2332,22 @@ static void updateQuickMenuScreen(bool isFirstRun)
 				case CH_SCREEN_QUICK_MENU_REORDER_CHANNELS:
 					rightSideConst = (char * const *)&currentLanguage->reorder_channels;
 					break;
->>>>>>> development
 				default:
 					buf[0] = 0;
 			}
 
 			if (leftSide != NULL)
 			{
-<<<<<<< HEAD
-				snprintf(buf, bufferLen, "%s:%s", *leftSide, (rightSideVar[0] ? rightSideVar : *rightSideConst));
-			}
-			else
-			{
-				snprintf(buf, bufferLen, "%s", (rightSideVar[0] ? rightSideVar : *rightSideConst));
-=======
 				snprintf(buf, SCREEN_LINE_BUFFER_SIZE, "%s:%s", *leftSide, (rightSideVar[0] ? rightSideVar : *rightSideConst));
 			}
 			else
 			{
 				snprintf(buf, SCREEN_LINE_BUFFER_SIZE, "%s", (rightSideVar[0] ? rightSideVar : *rightSideConst));
->>>>>>> development
 			}
 
 			if (i == 0)
 			{
 				if (!isFirstRun && (menuDataGlobal.menuOptionsSetQuickkey == 0))
-<<<<<<< HEAD
-				{
-					voicePromptsInit();
-=======
 				{
 					voicePromptsInit();
 				}
@@ -2550,33 +2360,9 @@ static void updateQuickMenuScreen(bool isFirstRun)
 				if (rightSideVar[0] != 0)
 				{
 					voicePromptsAppendString(rightSideVar);
->>>>>>> development
-				}
-
-				if (leftSide != NULL)
-				{
-<<<<<<< HEAD
-					voicePromptsAppendLanguageString((const char * const *)leftSide);
-				}
-
-				if (rightSideVar[0] != 0)
-				{
-					voicePromptsAppendString(rightSideVar);
 				}
 				else
 				{
-					voicePromptsAppendLanguageString((const char * const *)rightSideConst);
-				}
-
-				if (menuDataGlobal.menuOptionsTimeout != -1)
-				{
-					promptsPlayNotAfterTx();
-				}
-				else
-				{
-					menuDataGlobal.menuOptionsTimeout = 0;// clear flag indicating that a QuickKey has just been set
-				}
-=======
 					voicePromptsAppendLanguageString((const char * const *)rightSideConst);
 				}
 				if (menuDataGlobal.menuOptionsTimeout != -1)
@@ -2587,7 +2373,6 @@ static void updateQuickMenuScreen(bool isFirstRun)
 				{
 					menuDataGlobal.menuOptionsTimeout = 0;// clear flag indicating that a QuickKey has just been set
 				}
->>>>>>> development
 			}
 
 			if (menuDataGlobal.menuOptionsTimeout > 0)
@@ -2741,13 +2526,6 @@ static void handleQuickMenuEvent(uiEvent_t *ev)
 				break;
 			case CH_SCREEN_QUICK_MENU_DUAL_SCAN:
 			{
-<<<<<<< HEAD
-				uint16_t channelIndex= CODEPLUG_ZONE_IS_ALLCHANNELS(currentZone) ? nonVolatileSettings.currentChannelIndexInAllZone : nonVolatileSettings.currentChannelIndexInZone;
-				StartDualWatch(channelIndex, 1000, false);
-				menuSystemPopAllAndDisplaySpecificRootMenu(UI_CHANNEL_MODE, true);
-				break;
-			}
-=======
 				uint16_t currentChannelIndexRelativeToCurrentZone= CODEPLUG_ZONE_IS_ALLCHANNELS(currentZone) ? nonVolatileSettings.currentChannelIndexInAllZone : nonVolatileSettings.currentChannelIndexInZone;
 				uint16_t currentChannelIndexRelativeToAllChannels=currentZone.channels[nonVolatileSettings.currentChannelIndexInZone];
 				// The watch channel must be relative to all Channels zone, the current channel is relevant to the current zone.
@@ -2807,7 +2585,6 @@ static void handleQuickMenuEvent(uiEvent_t *ev)
 			reorderingChannels=true;
 			menuSystemPopAllAndDisplaySpecificRootMenu(UI_CHANNEL_MODE, true);
 			break;
->>>>>>> development
 		}
 		return;
 	}
@@ -4557,12 +4334,8 @@ if (GD77SParameters.cycleFunctionsInReverse && BUTTONCHECK_DOWN(ev, BUTTON_SK1)=
 }
 		if (BUTTONCHECK_LONGDOWN(ev, BUTTON_ORANGE) && (uiDataGlobal.DTMFContactList.isKeying == false))
 		{
-<<<<<<< HEAD
-			announceItem(PROMPT_SEQUENCE_BATTERY, PROMPT_THRESHOLD_2);
-=======
 			announceItem(PROMPT_SEQUENCE_BATTERY, PROMPT_THRESHOLD_NEVER_PLAY_IMMEDIATELY);// next call will call play for immediate announcement.
 			announceItemWithInit(false, PROMPT_SEQUENCE_TEMPERATURE, PROMPT_THRESHOLD_2);
->>>>>>> development
 			return;
 		}
 		else if (BUTTONCHECK_SHORTUP(ev, BUTTON_ORANGE) && (uiDataGlobal.DTMFContactList.isKeying == false))

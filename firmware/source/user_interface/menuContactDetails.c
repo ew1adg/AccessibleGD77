@@ -207,11 +207,7 @@ static void updateScreen(bool isFirstRun, bool allowedToSpeakUpdate)
 				{
 					case CONTACT_DETAILS_NAME:
 						leftSide = (char * const *)&currentLanguage->name;
-<<<<<<< HEAD
-						strncpy(rightSideVar, contactName, 17);
-=======
 						strncpy(rightSideVar, contactName, SCREEN_LINE_BUFFER_SIZE);
->>>>>>> development
 						break;
 					case CONTACT_DETAILS_TG:
 						{
@@ -247,11 +243,7 @@ static void updateScreen(bool isFirstRun, bool allowedToSpeakUpdate)
 									break;
 								case CONTACT_CALLTYPE_ALL: // All Call
 									leftSide = (char * const *)&currentLanguage->all;
-<<<<<<< HEAD
-									snprintf(rightSideVar, bufferLen, "%d", 16777215);
-=======
 									snprintf(rightSideVar, SCREEN_LINE_BUFFER_SIZE, "%u", MAX_TG_OR_PC_VALUE);
->>>>>>> development
 									leftSideConst = (char * const *)&currentLanguage->all_call;
 									break;
 							}
@@ -287,17 +279,10 @@ static void updateScreen(bool isFirstRun, bool allowedToSpeakUpdate)
 									rightSideConst = (char * const *)&currentLanguage->none;
 									break;
 								case 0:
-<<<<<<< HEAD
-									snprintf(rightSideVar, bufferLen, "%d", 1);
-									break;
-								case 2:
-									snprintf(rightSideVar, bufferLen, "%d", 2);
-=======
 									snprintf(rightSideVar, SCREEN_LINE_BUFFER_SIZE, "%u", 1);
 									break;
 								case 2:
 									snprintf(rightSideVar, SCREEN_LINE_BUFFER_SIZE, "%u", 2);
->>>>>>> development
 									break;
 							}
 							break;
@@ -422,15 +407,11 @@ static void handleEvent(uiEvent_t *ev)
 							{
 								tmpContact.callType++;
 							}
-<<<<<<< HEAD
-							itoa(tmpContact.callType == CONTACT_CALLTYPE_ALL ? 16777215 : tmpContact.tgNumber, digits, 10);
-=======
 							itoa(tmpContact.callType == CONTACT_CALLTYPE_ALL ? MAX_TG_OR_PC_VALUE : tmpContact.tgNumber, digits, 10);
 							if (tmpContact.tgNumber == 0)
 							{
 								digits[0] = 0;
 							}
->>>>>>> development
 							break;
 						case CONTACT_DETAILS_TS:
 							if ((tmpContact.reserve1 & 0x01) && ((tmpContact.reserve1 & 0x02) == 0))
@@ -456,15 +437,11 @@ static void handleEvent(uiEvent_t *ev)
 							{
 								tmpContact.callType--;
 							}
-<<<<<<< HEAD
-							itoa(tmpContact.callType == CONTACT_CALLTYPE_ALL ? 16777215 : tmpContact.tgNumber, digits, 10);
-=======
 							itoa(tmpContact.callType == CONTACT_CALLTYPE_ALL ? MAX_TG_OR_PC_VALUE : tmpContact.tgNumber, digits, 10);
 							if (tmpContact.tgNumber == 0)
 							{
 								digits[0] = 0;
 							}
->>>>>>> development
 							break;
 						case CONTACT_DETAILS_TS:
 							if (((tmpContact.reserve1 & 0x01) == 0x0) || ((tmpContact.reserve1 & 0x03) == 0x00))
@@ -508,21 +485,13 @@ static void handleEvent(uiEvent_t *ev)
 									}
 									else
 									{
-<<<<<<< HEAD
-										snprintf(buf, bufferLen, "%s %d", currentLanguage->pc, tmpContact.tgNumber);
-=======
 										snprintf(buf, SCREEN_LINE_BUFFER_SIZE, "%s %u", currentLanguage->pc, tmpContact.tgNumber);
->>>>>>> development
 										codeplugUtilConvertStringToBuf(buf, tmpContact.name, 16);
 									}
 								}
 								else
 								{
-<<<<<<< HEAD
-									snprintf(buf, bufferLen, "%s %d", currentLanguage->tg, tmpContact.tgNumber);
-=======
 									snprintf(buf, SCREEN_LINE_BUFFER_SIZE, "%s %u", currentLanguage->tg, tmpContact.tgNumber);
->>>>>>> development
 									codeplugUtilConvertStringToBuf(buf, tmpContact.name, 16);
 								}
 							}

@@ -85,13 +85,10 @@ typedef enum
 	PROMPT_SEQUENCE_ZONE_AND_CHANNEL_NAME,
 	PROMPT_SEQUENCE_VFO_INPUT_RX_FIELD_AND_FREQ,
 	PROMPT_SEQUENCE_VFO_INPUT_TX_FIELD_AND_FREQ,
-<<<<<<< HEAD
-=======
 	PROMPT_SEQUENCE_BANDWIDTH,
 	PROMPT_SEQUENCE_DIRECTION_TX,
 	PROMPT_SEQUENCE_DIRECTION_RX,
 	PROMPT_SEQUENCE_CHANNEL_NUMBER_AND_NAME,
->>>>>>> development
 	NUM_PROMPT_SEQUENCES
 } voicePromptItem_t;
 
@@ -180,11 +177,7 @@ void uiUtilityBuildTgOrPCDisplayName(char *nameBuf, int bufferLen);
 void acceptPrivateCall(uint32_t id, int timeslot);
 bool rebuildVoicePromptOnExtraLongSK1(uiEvent_t *ev);
 bool repeatVoicePromptOnSK1(uiEvent_t *ev);
-<<<<<<< HEAD
-void AnnounceChannelSummary(bool voicePromptWasPlaying);
-=======
 void AnnounceChannelSummary(bool voicePromptWasPlaying, bool announceName);
->>>>>>> development
 bool handleMonitorMode(uiEvent_t *ev);
 void uiUtilityDisplayInformation(const char *str, displayInformation_t line, int8_t yOverride);
 void uiUtilityRenderQSODataAndUpdateScreen(void);

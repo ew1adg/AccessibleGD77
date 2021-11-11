@@ -93,12 +93,9 @@ menuDataGlobal_t menuDataGlobal =
 				NULL,// Private Call
 				NULL,// MessageBox
 				NULL,// New DTMF Contact
-<<<<<<< HEAD
-=======
 				NULL,// Last Heard SubMenu
 				NULL, // AutoZone
 				NULL, // MENU_RADIO_DETAILS
->>>>>>> development
 		}
 };
 
@@ -136,14 +133,10 @@ static menuFunctionData_t menuFunctions[] =
 		{ menuLanguage,             0 },
 		{ menuPrivateCall,          0 },
 		{ uiMessageBox,             0 },
-<<<<<<< HEAD
-		{ menuDTMFContactDetails,       0 }, // New DTMF contact
-=======
 		{ menuDTMFContactDetails,   0 }, // New DTMF contact
 		{ menuLastHeardSubMenu,     0 },
 		{ menuAutoZone,             0 },
 		{ menuRadioDetails, 		0 },
->>>>>>> development
 };
 
 static void menuSystemCheckForFirstEntryAudible(menuStatus_t status)

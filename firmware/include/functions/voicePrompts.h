@@ -71,10 +71,6 @@ typedef enum
 	PROMPT_COLORCODE_MODE,
 	PROMPT_HERTZ,
 	PROMPT_SETTINGS_UPDATE,
-<<<<<<< HEAD
-	PROMPT_HASH,
-	PROMPT_STAR,
-=======
 	PROMPT_STAR,
 	PROMPT_HASH,
 	PROMPT_VOX,
@@ -88,7 +84,6 @@ typedef enum
 	PROMPT_UNUSED_8,
 	PROMPT_UNUSED_9,
 	PROMPT_UNUSED_10,
->>>>>>> development
 	NUM_VOICE_PROMPTS
 } voicePrompt_t;
 

@@ -158,34 +158,6 @@ static void redrawScreen(bool update, bool state)
 		ucPrintCentered(40, currentLanguage->press_blue_plus_star, FONT_SIZE_1);
 		ucPrintCentered(48, currentLanguage->to_unlock, FONT_SIZE_1);
 #endif
-<<<<<<< HEAD
-
-		voicePromptsInit();
-		voicePromptsAppendPrompt(PROMPT_SILENCE);
-		if (nonVolatileSettings.audioPromptMode > AUDIO_PROMPT_MODE_VOICE_LEVEL_1)
-		{
-			if (lockState & LOCK_KEYPAD)
-			{
-				voicePromptsAppendLanguageString(&currentLanguage->keypad);
-				voicePromptsAppendPrompt(PROMPT_SILENCE);
-			}
-
-			if (lockState & LOCK_PTT)
-			{
-				voicePromptsAppendLanguageString(&currentLanguage->ptt);
-				voicePromptsAppendPrompt(PROMPT_SILENCE);
-			}
-		}
-		voicePromptsAppendLanguageString(&currentLanguage->locked);
-		if (nonVolatileSettings.audioPromptMode == AUDIO_PROMPT_MODE_VOICE_LEVEL_3)
-		{
-			voicePromptsAppendPrompt(PROMPT_SILENCE);
-			voicePromptsAppendLanguageString(&currentLanguage->press_blue_plus_star);
-			voicePromptsAppendLanguageString(&currentLanguage->to_unlock);
-			voicePromptsAppendPrompt(PROMPT_SILENCE);
-		}
-		voicePromptsPlay();
-=======
 // if SK2 is latched, do not speak anything, let the beep occur.
 		bool allowedToSpeak=true;
 #if !defined(PLATFORM_GD77S)
@@ -196,7 +168,6 @@ static void redrawScreen(bool update, bool state)
 		{
 			AnnounceLockMessage();
 		}
->>>>>>> development
 	}
 	else
 	{

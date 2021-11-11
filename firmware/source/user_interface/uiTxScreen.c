@@ -279,20 +279,6 @@ menuStatus_t menuTxScreen(uiEvent_t *ev, bool isFirstRun)
 					handleTxTermination(ev, TXSTOP_DTMF_KEYING_TIMEOUT);
 				}
 			}
-<<<<<<< HEAD
-			//DTMF latch
-			if (dtmfLatchState==dtmfPTTLatched)
-			{
-				if (dtmfPTTLatchTimeout > 0)
-					dtmfPTTLatchTimeout--;
-				else
-				{
-					dtmfLatchState=dtmfNotLatched;
-					handleTxTermination(ev, TXSTOP_DTMF_KEYING_TIMEOUT);
-				}
-			}
-=======
->>>>>>> development
 			//end of DTMF latch
 		}
 
@@ -387,11 +373,7 @@ static void handleEvent(uiEvent_t *ev)
 {
 	// Xmiting ends (normal or timeouted)
 	if ((((ev->buttons & BUTTON_PTT) == 0) && (dtmfLatchState==dtmfNotLatched))
-<<<<<<< HEAD
-			|| ((currentChannelData->tot != 0) && (timeInSeconds == 0)))
-=======
 			|| ((timeout != 0) && (timeInSeconds == 0)))
->>>>>>> development
 	{
 		if (trxTransmissionEnabled)
 		{
@@ -482,12 +464,6 @@ static void handleEvent(uiEvent_t *ev)
 			{
 				trxSetDTMF(keyval);
 				isTransmittingTone = true;
-<<<<<<< HEAD
-				dtmfLatchState=dtmfTransmittingCode;
-				dtmfPTTLatchTimeout=0;
-				PTTToggledDown = true; // released after a timeout when the dtmf key is released.
-				dtmfPTTLatch=true;
-=======
 				PTTToggledDown = true; // released after a timeout when the dtmf key is released.
 				if (nonVolatileSettings.dtmfLatch > 0)
 				{
@@ -495,7 +471,6 @@ static void handleEvent(uiEvent_t *ev)
 					dtmfPTTLatchTimeout=0;
 					dtmfPTTLatch=true;
 				}
->>>>>>> development
 				trxSelectVoiceChannel(AT1846_VOICE_CHANNEL_DTMF);
 				enableAudioAmp(AUDIO_AMP_MODE_RF);
 				GPIO_PinWrite(GPIO_RX_audio_mux, Pin_RX_audio_mux, 1);
@@ -510,11 +485,7 @@ static void handleEvent(uiEvent_t *ev)
 		if (dtmfLatchState==dtmfTransmittingCode)
 		{
 			dtmfLatchState=dtmfPTTLatched;
-<<<<<<< HEAD
-			dtmfPTTLatchTimeout=1500;
-=======
 			dtmfPTTLatchTimeout=nonVolatileSettings.dtmfLatch * 500; // nonVolatileSettings.dtmfLatch 	is units of 500 ms.	
->>>>>>> development
 		}
 		trxSelectVoiceChannel(AT1846_VOICE_CHANNEL_MIC);
 		disableAudioAmp(AUDIO_AMP_MODE_RF);
@@ -549,11 +520,6 @@ static void handleTxTermination(uiEvent_t *ev, txTerminationReason_t reason)
 	PTTToggledDown = false;
 	voxReset();
 	dtmfPTTLatch=false;
-<<<<<<< HEAD
-
-	ucClearBuf();
-=======
->>>>>>> development
 
 	voicePromptsTerminate();
 	voicePromptsInit();

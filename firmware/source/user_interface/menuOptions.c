@@ -42,17 +42,11 @@ enum OPTIONS_MENU_LIST { OPTIONS_MENU_TX_FREQ_LIMITS = 0U,
 							OPTIONS_MENU_KEYPAD_TIMER_LONG, OPTIONS_MENU_KEYPAD_TIMER_REPEAT, OPTIONS_MENU_DMR_MONITOR_CAPTURE_TIMEOUT,
 							OPTIONS_MENU_SCAN_DELAY, OPTIONS_MENU_SCAN_STEP_TIME, OPTIONS_MENU_SCAN_MODE, OPTIONS_MENU_SCAN_ON_BOOT,
 							OPTIONS_MENU_SQUELCH_DEFAULT_VHF, OPTIONS_MENU_SQUELCH_DEFAULT_220MHz, OPTIONS_MENU_SQUELCH_DEFAULT_UHF,
-<<<<<<< HEAD
-							OPTIONS_MENU_PTT_TOGGLE,
-#if !defined(PLATFORM_GD77S)
-							OPTIONS_MENU_SK2_LATCH,
-=======
 							OPTIONS_MENU_TOT_MASTER,
 							OPTIONS_MENU_PTT_TOGGLE,
 							#if !defined(PLATFORM_GD77S)
 							OPTIONS_MENU_SK2_LATCH,
 							OPTIONS_MENU_DTMF_LATCH,
->>>>>>> development
 #endif
 							OPTIONS_MENU_HOTSPOT_TYPE, OPTIONS_MENU_TALKER_ALIAS_TX,
 							OPTIONS_MENU_PRIVATE_CALLS,
@@ -250,11 +244,6 @@ static void updateScreen(bool isFirstRun)
 					break;
 #if !defined(PLATFORM_GD77S)
 				case OPTIONS_MENU_SK2_LATCH:
-<<<<<<< HEAD
-								leftSide = (char * const *)&currentLanguage->sk2Latch;
-								rightSideConst = (char * const *)(nonVolatileSettings.sk2Latch ? &currentLanguage->on : &currentLanguage->off);
-								break;
-=======
 					leftSide = (char * const *)&currentLanguage->sk2Latch;
 					if (nonVolatileSettings.sk2Latch > 0)
 					{
@@ -276,7 +265,6 @@ static void updateScreen(bool isFirstRun)
 					else
 						rightSideConst = (char * const *)&currentLanguage->off;
 					break;
->>>>>>> development
 #endif
 				case OPTIONS_MENU_HOTSPOT_TYPE:
 					leftSide = (char * const *)&currentLanguage->hotspot_mode;
@@ -702,14 +690,6 @@ static void handleEvent(uiEvent_t *ev)
 					if (nonVolatileSettings.uhfOffset < 9900)
 						settingsIncrement(nonVolatileSettings.uhfOffset, 100);
 					break;
-					#if !defined(PLATFORM_GD77S)
-				case OPTIONS_MENU_SK2_LATCH:
-					if (nonVolatileSettings.sk2Latch==0)
-					{
-						nonVolatileSettings.sk2Latch=1;
-					}
-					break;
-#endif
 			}
 		}
 		else if (KEYCHECK_PRESS(ev->keys, KEY_LEFT) || (QUICKKEY_FUNCTIONID(ev->function) == FUNC_LEFT))
@@ -886,16 +866,6 @@ static void handleEvent(uiEvent_t *ev)
 					}
 					uiDataGlobal.priorityChannelIndex=nonVolatileSettings.priorityChannelIndex;
 					break;
-<<<<<<< HEAD
-#if !defined(PLATFORM_GD77S)
-				case OPTIONS_MENU_SK2_LATCH:
-					if (nonVolatileSettings.sk2Latch == 1)
-					{
-						nonVolatileSettings.sk2Latch=0;
-					}
-					break;
-#endif
-=======
 				}
 			case OPTIONS_MENU_VHF_RPT_OFFSET:
 				if (nonVolatileSettings.vhfOffset > 100)
@@ -905,7 +875,6 @@ static void handleEvent(uiEvent_t *ev)
 				if (nonVolatileSettings.uhfOffset > 100)
 					settingsDecrement(nonVolatileSettings.uhfOffset, 100);
 				break;
->>>>>>> development
 			}
 		}
 		else if ((ev->keys.event & KEY_MOD_PRESS) && (menuDataGlobal.menuOptionsTimeout > 0))

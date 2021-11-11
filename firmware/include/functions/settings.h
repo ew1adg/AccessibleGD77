@@ -119,9 +119,6 @@ typedef struct
 	int8_t			temperatureCalibration;// Units of 0.5 deg C
 	uint8_t			batteryCalibration; // Units of 0.01V
 	uint8_t			ecoLevel;// Power saving / economy level
-<<<<<<< HEAD
-	uint8_t sk2Latch;
-=======
 	uint8_t sk2Latch; // 0 off, then increments of 500 ms, starting at 1 s to 5 s, i.e. valid vvalues 0, 2-10.
 	uint8_t dtmfLatch; // 0 off, then increments of 500 ms, valid values from 2 to 6 i.e. 1 to 3 seconds.
 	uint16_t		priorityChannelIndex; // priority channel index.
@@ -135,7 +132,6 @@ typedef struct
 	uint8_t voicePromptVolumePercent; // percent of max volume
 	uint8_t voicePromptRate;
 	// Currently this struct is 184 bytes. It can be a maximum of 256 bytes JKS 23 Oct 2021. 
->>>>>>> development
 } settingsStruct_t;
 
 typedef enum DMR_DESTINATION_FILTER_TYPE

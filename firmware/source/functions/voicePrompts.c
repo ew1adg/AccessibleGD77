@@ -239,18 +239,6 @@ void voicePromptsTerminate(void)
 	if (voicePromptIsActive)
 	{
 		disableAudioAmp(AUDIO_AMP_MODE_PROMPT);
-<<<<<<< HEAD
-		voicePromptIsActive = false;
-		voicePromptsCurrentSequence.Pos = 0;
-		soundTerminateSound();
-		soundInit();
-		// Only do this if a carrier is detected to avoid squelch tail at end of voice prompt on DM1801 and RD5R.
-		// If squelch is open at time of vp, need to reconnect spkr or rf volume will be set to 0.
-		if (trxGetMode() == RADIO_MODE_ANALOG && trxCarrierDetected())
-		{
-			GPIO_PinWrite(GPIO_RX_audio_mux, Pin_RX_audio_mux, 1); // connect AT1846S audio to speaker
-		}
-=======
 
 		voicePromptsCurrentSequence.Pos = 0;
 		soundTerminateSound();
@@ -260,7 +248,6 @@ void voicePromptsTerminate(void)
 		taskENTER_CRITICAL();
 		voicePromptIsActive = false;
 		taskEXIT_CRITICAL();
->>>>>>> development
 	}
 }
 

@@ -220,10 +220,6 @@ typedef struct
    const char *scan_on_boot;
    const char* dtmf_entry;
    const char* name;
-<<<<<<< HEAD
-   const char* vox;
-   const char* sk2Latch;
-=======
    const char *openDM1801A;
    const char* sk2Latch;
    const char* dtmfLatch;
@@ -243,7 +239,6 @@ typedef struct
    const char* reorder_channels;
    const char* voice_prompt_vol;
    const char* voice_prompt_rate;
->>>>>>> development
 } stringsTable_t;
 
 extern const stringsTable_t languages[];

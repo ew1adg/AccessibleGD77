@@ -61,11 +61,7 @@ static const int BATTERY_ITER_PUSHBACK = 20;
 
 static void updateScreen(bool forceRedraw);
 static void handleEvent(uiEvent_t *ev);
-<<<<<<< HEAD
-static void updateVoicePrompts(bool flushIt, bool spellIt);
-=======
 static void updateVoicePrompts(bool spellIt, bool firstRun);
->>>>>>> development
 
 static void circularBufferInit(voltageCircularBuffer_t *cb)
 {
@@ -130,21 +126,8 @@ menuStatus_t menuRadioInfos(uiEvent_t *ev, bool isFirstRun)
 		menuDisplayTitle(currentLanguage->radio_info);
 		ucRenderRows(0, 2);
 
-<<<<<<< HEAD
-		voicePromptsInit();
-		voicePromptsAppendLanguageString(&currentLanguage->radio_info);
-		if (nonVolatileSettings.audioPromptMode > AUDIO_PROMPT_MODE_VOICE_LEVEL_2)
-		{
-			voicePromptsAppendLanguageString(&currentLanguage->menu);
-		}
-		voicePromptsAppendPrompt(PROMPT_SILENCE);
-		updateVoicePrompts(false, true);
-
-		updateScreen(true);
-=======
 		updateScreen(true);
 		updateVoicePrompts(true, true);
->>>>>>> development
 	}
 	else
 	{
@@ -224,11 +207,7 @@ static void updateScreen(bool forceRedraw)
 
 				if (voicePromptsIsPlaying() == false)
 				{
-<<<<<<< HEAD
-					updateVoicePrompts(true, false);
-=======
 					updateVoicePrompts(false, false);
->>>>>>> development
 				}
 			}
 
@@ -327,11 +306,7 @@ static void updateScreen(bool forceRedraw)
 
 			if (voicePromptsIsPlaying() == false)
 			{
-<<<<<<< HEAD
-				updateVoicePrompts(true, false);
-=======
 				updateVoicePrompts(false, false);
->>>>>>> development
 			}
 		}
 		break;
@@ -403,11 +378,7 @@ static void updateScreen(bool forceRedraw)
 
 				if (voicePromptsIsPlaying() == false)
 				{
-<<<<<<< HEAD
-					updateVoicePrompts(true, false);
-=======
 					updateVoicePrompts(false, false);
->>>>>>> development
 				}
 			}
 
@@ -431,11 +402,7 @@ static void handleEvent(uiEvent_t *ev)
 		{
 			displayMode = QUICKKEY_ENTRYID(ev->function);
 			updateScreen(true);
-<<<<<<< HEAD
-			updateVoicePrompts(true, true);
-=======
 			updateVoicePrompts(true, false);
->>>>>>> development
 			return;
 		}
 	}
@@ -459,11 +426,7 @@ static void handleEvent(uiEvent_t *ev)
 		{
 			displayMode++;
 			updateScreen(true);
-<<<<<<< HEAD
-			updateVoicePrompts(true, true);
-=======
 			updateVoicePrompts(true, false);
->>>>>>> development
 		}
 	}
 	else if (KEYCHECK_PRESS(ev->keys, KEY_UP))
@@ -472,11 +435,7 @@ static void handleEvent(uiEvent_t *ev)
 		{
 			displayMode--;
 			updateScreen(true);
-<<<<<<< HEAD
-			updateVoicePrompts(true, true);
-=======
 			updateVoicePrompts(true, false);
->>>>>>> development
 		}
 	}
 	else if (KEYCHECK_PRESS(ev->keys, KEY_LEFT))
@@ -539,22 +498,12 @@ void menuRadioInfosPushBackVoltage(int32_t voltage)
 	battery_stack_iter++;
 }
 
-<<<<<<< HEAD
-static void updateVoicePrompts(bool flushIt, bool spellIt)
-=======
 static void updateVoicePrompts(bool spellIt, bool firstRun)
->>>>>>> development
 {
 	if (nonVolatileSettings.audioPromptMode >= AUDIO_PROMPT_MODE_VOICE_LEVEL_1)
 	{
 		char buffer[17];
 
-<<<<<<< HEAD
-		if (flushIt)
-		{
-			voicePromptsInit();
-		}
-=======
 		voicePromptsInit();
 
 		if (firstRun)
@@ -567,7 +516,6 @@ static void updateVoicePrompts(bool spellIt, bool firstRun)
 			voicePromptsAppendPrompt(PROMPT_SILENCE);
 		}
 
->>>>>>> development
 		switch (displayMode)
 		{
 			case RADIO_INFOS_BATTERY_LEVEL:

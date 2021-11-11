@@ -365,12 +365,8 @@ void enableVoicePromptsIfLoaded(bool enableFullPrompts)
 #if defined(PLATFORM_GD77S)
 		nonVolatileSettings.audioPromptMode = AUDIO_PROMPT_MODE_VOICE_LEVEL_3;
 #else
-<<<<<<< HEAD
-		nonVolatileSettings.audioPromptMode = AUDIO_PROMPT_MODE_VOICE_LEVEL_3;
-=======
 
 		nonVolatileSettings.audioPromptMode = enableFullPrompts?AUDIO_PROMPT_MODE_VOICE_LEVEL_3:AUDIO_PROMPT_MODE_VOICE_LEVEL_1;
->>>>>>> development
 #endif
 		settingsDirty = true;
 		settingsSaveSettings(false);

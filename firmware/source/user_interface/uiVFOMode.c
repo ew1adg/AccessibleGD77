@@ -1048,26 +1048,7 @@ static void handleEvent(uiEvent_t *ev)
 			{
 								if ( ToggleFMBandwidth(ev, currentChannelData))
 				{
-<<<<<<< HEAD
-					if (trxGetMode() == RADIO_MODE_ANALOG)
-					{
-						currentChannelData->chMode = RADIO_MODE_DIGITAL;
-						checkAndFixIndexInRxGroup();
-						loadChannelData();
-						updateTrxID();
-						menuVFOExitStatus |= MENU_STATUS_FORCE_FIRST;
-					}
-					else
-					{
-						currentChannelData->chMode = RADIO_MODE_ANALOG;
-
-						trxSetModeAndBandwidth(currentChannelData->chMode, ((currentChannelData->flag4 & 0x02) == 0x02));
-					}
-
-					announceItem(PROMPT_SEQUENCE_MODE, PROMPT_THRESHOLD_2);
-=======
 					announceItem(PROMPT_SEQUENCE_BANDWIDTH, PROMPT_THRESHOLD_2);
->>>>>>> development
 					uiDataGlobal.displayQSOState = QSO_DISPLAY_DEFAULT_SCREEN;
 					if (currentChannelData->flag4&0x02)
 						menuVFOExitStatus |= MENU_STATUS_FORCE_FIRST;
@@ -1096,16 +1077,6 @@ static void handleEvent(uiEvent_t *ev)
 
 						announceItem(PROMPT_SEQUENCE_MODE, PROMPT_THRESHOLD_1);
 						uiDataGlobal.displayQSOState = QSO_DISPLAY_DEFAULT_SCREEN;
-<<<<<<< HEAD
-						uiVFOModeUpdateScreen(0);
-
-						if (trxGetDMRTimeSlot() == 0)
-						{
-							menuVFOExitStatus |= MENU_STATUS_FORCE_FIRST;
-						}
-						announceItem(PROMPT_SEQUENCE_TS,PROMPT_THRESHOLD_2);
-=======
->>>>>>> development
 					}
 					else
 					{
@@ -1175,17 +1146,7 @@ static void handleEvent(uiEvent_t *ev)
 			{
 				if (uiVFOModeSweepScanning(true) == false)
 				{
-<<<<<<< HEAD
-					// Don't permit to switch from RX/TX while scanning
-					if ((screenOperationMode[nonVolatileSettings.currentVFONumber] != VFO_SCREEN_OPERATION_SCAN) ||
-							(screenOperationMode[nonVolatileSettings.currentVFONumber] != VFO_SCREEN_OPERATION_DUAL_SCAN))
-					{
-						selectedFreq = VFO_SELECTED_FREQUENCY_INPUT_TX;
-						announceItem(PROMPT_SEQUENCE_VFO_INPUT_TX_FIELD_AND_FREQ, AUDIO_PROMPT_MODE_VOICE_LEVEL_2);
-					}
-=======
 					handleDownKey(ev);
->>>>>>> development
 				}
 				else
 				{
@@ -1416,16 +1377,7 @@ static void handleEvent(uiEvent_t *ev)
 							uiVFOModeUpdateScreen(0);
 							announceItem(PROMPT_SEQUENCE_CONTACT_TG_OR_PC,PROMPT_THRESHOLD_2);
 						}
-<<<<<<< HEAD
-						uiVFOModeUpdateScreen(0);
-						announceItem(PROMPT_SEQUENCE_CONTACT_TG_OR_PC,PROMPT_THRESHOLD_2);
-					}
-					else
-					{
-						if(currentChannelData->sql == 0) //If we were using default squelch level
-=======
 						else
->>>>>>> development
 						{
 							if(currentChannelData->sql == 0) //If we were using default squelch level
 							{
@@ -1510,16 +1462,7 @@ static void handleEvent(uiEvent_t *ev)
 							uiVFOModeUpdateScreen(0);
 							announceItem(PROMPT_SEQUENCE_CONTACT_TG_OR_PC,PROMPT_THRESHOLD_2);
 						}
-<<<<<<< HEAD
-						uiVFOModeUpdateScreen(0);
-						announceItem(PROMPT_SEQUENCE_CONTACT_TG_OR_PC,PROMPT_THRESHOLD_2);
-					}
-					else
-					{
-						if(currentChannelData->sql == 0) //If we were using default squelch level
-=======
 						else
->>>>>>> development
 						{
 							if(currentChannelData->sql == 0) //If we were using default squelch level
 							{
@@ -1531,19 +1474,12 @@ static void handleEvent(uiEvent_t *ev)
 								currentChannelData->sql--;
 							}
 
-<<<<<<< HEAD
-						announceItem(PROMPT_SQUENCE_SQUELCH,PROMPT_THRESHOLD_2);
-						uiDataGlobal.displayQSOState = QSO_DISPLAY_DEFAULT_SCREEN;
-						uiDataGlobal.displaySquelch = true;
-						uiVFOModeUpdateScreen(0);
-=======
 							announceItem(PROMPT_SQUENCE_SQUELCH,PROMPT_THRESHOLD_2);
 
 							uiDataGlobal.displayQSOState = QSO_DISPLAY_DEFAULT_SCREEN;
 							uiDataGlobal.displaySquelch = true;
 							uiVFOModeUpdateScreen(0);
 						}
->>>>>>> development
 					}
 				}
 			}
@@ -2215,11 +2151,7 @@ static void updateQuickMenuScreen(bool isFirstRun)
 	int prompt;// For voice prompts
 
 	ucClearBuf();
-<<<<<<< HEAD
-	bool settingOption = uiShowQuickKeysChoices(buf, bufferLen,currentLanguage->quick_menu);
-=======
 	bool settingOption = uiShowQuickKeysChoices(buf, SCREEN_LINE_BUFFER_SIZE,currentLanguage->quick_menu);
->>>>>>> development
 
 	for(int i = -1; i <= 1; i++)
 	{
@@ -2258,11 +2190,7 @@ static void updateQuickMenuScreen(bool isFirstRun)
 					}
 					else
 					{
-<<<<<<< HEAD
-						snprintf(rightSideVar, bufferLen, "%s", ANALOG_FILTER_LEVELS[uiDataGlobal.QuickMenu.tmpAnalogFilterLevel - 1]);
-=======
 						snprintf(rightSideVar, SCREEN_LINE_BUFFER_SIZE, "%s", ANALOG_FILTER_LEVELS[uiDataGlobal.QuickMenu.tmpAnalogFilterLevel - 1]);
->>>>>>> development
 					}
 					break;
 				case VFO_SCREEN_QUICK_MENU_FILTER_DMR:
@@ -2273,11 +2201,7 @@ static void updateQuickMenuScreen(bool isFirstRun)
 					}
 					else
 					{
-<<<<<<< HEAD
-						snprintf(rightSideVar, bufferLen, "%s", DMR_DESTINATION_FILTER_LEVELS[uiDataGlobal.QuickMenu.tmpDmrDestinationFilterLevel - 1]);
-=======
 						snprintf(rightSideVar, SCREEN_LINE_BUFFER_SIZE, "%s", DMR_DESTINATION_FILTER_LEVELS[uiDataGlobal.QuickMenu.tmpDmrDestinationFilterLevel - 1]);
->>>>>>> development
 					}
 					break;
 				case VFO_SCREEN_QUICK_MENU_DMR_CC_FILTER:
@@ -2315,11 +2239,7 @@ static void updateQuickMenuScreen(bool isFirstRun)
 							offset = 3;
 						}
 
-<<<<<<< HEAD
-						snprintf(rightSideVar, bufferLen, "%s", scanCSS[offset]);
-=======
 						snprintf(rightSideVar, SCREEN_LINE_BUFFER_SIZE, "%s", scanCSS[offset]);
->>>>>>> development
 
 						if (uiDataGlobal.QuickMenu.tmpToneScanCSS == CSS_TYPE_NONE)
 						{
@@ -2342,16 +2262,6 @@ static void updateQuickMenuScreen(bool isFirstRun)
 					strcpy(buf, "");
 					break;
 			}
-<<<<<<< HEAD
-
-			if (leftSide != NULL)
-			{
-				snprintf(buf, bufferLen, "%s:%s", *leftSide, (rightSideVar[0] ? rightSideVar : *rightSideConst));
-			}
-			else
-			{
-				snprintf(buf, bufferLen, "%s", ((rightSideVar[0] != 0) ? rightSideVar : *rightSideConst));
-=======
 			
 			if (leftSide != NULL)
 			{
@@ -2360,27 +2270,17 @@ static void updateQuickMenuScreen(bool isFirstRun)
 			else
 			{
 				snprintf(buf, SCREEN_LINE_BUFFER_SIZE, "%s", ((rightSideVar[0] != 0) ? rightSideVar : *rightSideConst));
->>>>>>> development
 			}
 
 			if (i == 0)
 			{
 				if (!isFirstRun && (menuDataGlobal.menuOptionsSetQuickkey == 0))
-<<<<<<< HEAD
 				{
 					voicePromptsInit();
 				}
 
 				if (prompt != -1)
 				{
-=======
-				{
-					voicePromptsInit();
-				}
-
-				if (prompt != -1)
-				{
->>>>>>> development
 					voicePromptsAppendPrompt(prompt);
 				}
 				else
@@ -2478,11 +2378,7 @@ static void handleQuickMenuEvent(uiEvent_t *ev)
 			return;
 		}
 
-<<<<<<< HEAD
-#if defined(PLATFORM_GD77) || defined(PLATFORM_GD77S) || defined(PLATFORM_RD5R)
-=======
 #if defined(PLATFORM_GD77) || defined(PLATFORM_GD77S) || defined(PLATFORM_RD5R) || defined(PLATFORM_DM1801A)
->>>>>>> development
 		if (nonVolatileSettings.currentVFONumber != uiDataGlobal.QuickMenu.tmpVFONumber)
 		{
 			settingsSet(nonVolatileSettings.currentVFONumber, uiDataGlobal.QuickMenu.tmpVFONumber);
@@ -2901,8 +2797,6 @@ static void setCurrentFreqToScanLimits(void)
 		currentChannelData->txFreq = currentChannelData->rxFreq + offset;
 		trxSetFrequency(currentChannelData->rxFreq, currentChannelData->txFreq, DMR_MODE_AUTO);
 		announceItem(PROMPT_SEQUENCE_CHANNEL_NAME_OR_VFO_FREQ, PROMPT_THRESHOLD_2);
-<<<<<<< HEAD
-=======
 	}
 }
 
@@ -3007,7 +2901,6 @@ static void sweepScanStep(void)
 		uiDataGlobal.Scan.scanSweepCurrentFreq = currentChannelData->rxFreq + (VFO_SWEEP_SCAN_RANGE_SAMPLE_STEP_TABLE[uiDataGlobal.Scan.sweepStepSizeIndex] * (uiDataGlobal.Scan.sweepSampleIndex - 64)) / VFO_SWEEP_PIXELS_PER_STEP;
 
 		trxSetFrequency(uiDataGlobal.Scan.scanSweepCurrentFreq, currentChannelData->txFreq, DMR_MODE_AUTO);
->>>>>>> development
 	}
 }
 

@@ -106,13 +106,8 @@ const stringsTable_t englishLanguage =
 .bandwidth				= "Bandwidth", // MaxLen: 16 (with ':' + .n_a, "25kHz" or "12.5kHz")
 .stepFreq				= "Step", // MaxLen: 7 (with ':' + xx.xxkHz fitted)
 .tot					= "TOT", // MaxLen: 16 (with ':' + .off or 15..3825)
-<<<<<<< HEAD
-.off					= "Off", // MaxLen: 16 (with ':' + .timeout_beep, .calibration or .band_limits)
-.zone_skip				= "Zone Skip", // MaxLen: 16 (with ':' + .yes or .no)
-=======
 .off					= "Off", // MaxLen: 16 (with ':' + .timeout_beep, .band_limits)
 .zone_skip				= "Zone Skip", // MaxLen: 16 (with ':' + .yes or .no) 
->>>>>>> development
 .all_skip				= "All Skip", // MaxLen: 16 (with ':' + .yes or .no)
 .yes					= "Yes", // MaxLen: 16 (with ':' + .zone_skip, .all_skip)
 .no					= "No", // MaxLen: 16 (with ':' + .zone_skip, .all_skip)
@@ -213,12 +208,6 @@ const stringsTable_t englishLanguage =
 .high					= "High",
 .dmr_id					= "DMR ID",
 .scan_on_boot				= "Scan On Boot",
-<<<<<<< HEAD
-.dtmf_entry = "DTMF entry",
-.name = "Name",
-.vox = "Vox",
-.sk2Latch="SK2 Latch"
-=======
 .dtmf_entry				= "DTMF Entry",
 .name					= "Name",
 .openDM1801A 				= "Acc. DM1801A", // Do not translate
@@ -240,7 +229,6 @@ const stringsTable_t englishLanguage =
 .reorder_channels="Reorder Channels",
 .voice_prompt_vol = "Voice Vol",
 .voice_prompt_rate="Voice Rate"
->>>>>>> development
 };
 /********************************************************************
  *

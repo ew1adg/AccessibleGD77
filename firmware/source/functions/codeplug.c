@@ -831,12 +831,7 @@ int codeplugContactGetDataForNumberInType(int number, uint32_t callType, struct_
 		{
 			if (codeplugContactGetDataForIndex(codeplugContactsCache.contactsLookupCache[i].index, contact))
 			{
-<<<<<<< HEAD
-				pos = codeplugContactsCache.contactsLookupCache[i].index;
-				break;
-=======
 				return codeplugContactsCache.contactsLookupCache[i].index;
->>>>>>> development
 			}
 		}
 	}

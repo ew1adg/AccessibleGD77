@@ -1,12 +1,8 @@
 /*
  * Copyright (C) 2019-2021 Roger Clark, VK3KYY / G4KYF
  *                         Daniel Caujolle-Bert, F1RMB
-<<<<<<< HEAD
- * Joseph Stephen VK7JS
-=======
  *                         Joseph Stephen VK7JS
  *                         Jan Hegr, OK1TE
->>>>>>> development
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions
  * are met:
@@ -88,14 +84,6 @@ menuStatus_t menuRSSIScreen(uiEvent_t *ev, bool isFirstRun)
 // Returns S-Unit 0..9..10(S9+10dB)..15(S9+60)
 static int32_t getSignalStrength(int dbm)
 {
-<<<<<<< HEAD
-	if (dbm < DBM_LEVELS[1])
-	{
-		return 0;
-	}
-
-=======
->>>>>>> development
 	for (int8_t i = 15; i >= 0; i--)
 	{
 		if (dbm >= DBM_LEVELS[i])
@@ -247,22 +235,16 @@ static void updateScreen(bool forceRedraw, bool isFirstRun)
 
 static void handleEvent(uiEvent_t *ev)
 {
-<<<<<<< HEAD
-=======
 	if (BUTTONCHECK_DOWN(ev, BUTTON_SK1) == 0)
 	{
 		shouldBeep = false;
 	}
 
->>>>>>> development
 	if (handleMonitorMode(ev))
 	{
 		return;
 	}
-<<<<<<< HEAD
-=======
 
->>>>>>> development
 	if (ev->events & BUTTON_EVENT)
 	{
 		bool wasPlaying = false;

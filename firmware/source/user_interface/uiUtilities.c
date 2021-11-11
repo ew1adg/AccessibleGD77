@@ -1947,21 +1947,6 @@ ANNOUNCE_STATIC void announceZoneName(bool voicePromptWasPlaying)
 	{
 		voicePromptsAppendLanguageString(&currentLanguage->zone);
 	}
-<<<<<<< HEAD
-	if (strcmp(currentZone.name,currentLanguage->all_channels) == 0)
-		voicePromptsAppendLanguageString(&currentLanguage->all_channels);
-	else
-	{
-		int len=strlen(currentLanguage->zone);
-		if (strncmp(currentZone.name,currentLanguage->zone, len)==0)
-		{
-			voicePromptsAppendLanguageString(&currentLanguage->zone);
-			if (strlen(currentZone.name) > len)
-				voicePromptsAppendString(currentZone.name+len);
-		}
-		else
-			voicePromptsAppendString(currentZone.name);
-=======
 
 	codeplugUtilConvertBufToString(currentZone.name, nameBuf, 16);
 
@@ -1984,7 +1969,6 @@ ANNOUNCE_STATIC void announceZoneName(bool voicePromptWasPlaying)
 		{
 			voicePromptsAppendString(currentZone.name);
 		}
->>>>>>> development
 	}
 }
 
@@ -2219,10 +2203,6 @@ static void announceQRG(uint32_t qrg, bool unit)
 	}
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> development
 static void announceFrequencyEx(bool announcePrompt, bool announceRx, bool announceTx)
 {
 	bool duplex = (currentChannelData->txFreq != currentChannelData->rxFreq);
@@ -2409,22 +2389,14 @@ void announceItemWithInit(bool init, voicePromptItem_t item, audioPromptThreshol
 		return;
 	}
 
-<<<<<<< HEAD
-	bool level2=nonVolatileSettings.audioPromptMode == AUDIO_PROMPT_MODE_VOICE_LEVEL_2;
-=======
 	bool lessVerbose =nonVolatileSettings.audioPromptMode <= AUDIO_PROMPT_MODE_VOICE_LEVEL_2;
->>>>>>> development
 	// If voice prompts are already playing and further speech is requested, a less verbose sequence is spoken.
 	// This is known as follow-on.
 	// For example, at level 3, if the name and mode are being spoken,
 	// the user would hear "channel" name "mode" fm.
 	// If follow-on occurs, they'd just hear name fm.
 	// At voice prompt level 2, we always enforce follow-on to reduce verbosity.
-<<<<<<< HEAD
-	bool voicePromptWasPlaying = voicePromptsIsPlaying() || level2;
-=======
 	bool voicePromptWasPlaying = voicePromptsIsPlaying() || lessVerbose;
->>>>>>> development
 
 	voicePromptSequenceState = item;
 
@@ -2499,11 +2471,7 @@ void announceItemWithInit(bool init, voicePromptItem_t item, audioPromptThreshol
 		if (voicePromptSequenceState==PROMPT_SEQUENCE_ZONE)
 			break;
 		voicePromptsAppendPrompt(PROMPT_SILENCE);
-<<<<<<< HEAD
-		announceChannelName(voicePromptWasPlaying);
-=======
 		announceChannelName(!voicePromptWasPlaying, false);
->>>>>>> development
 	//	deliberate fall through to announce mode.
 	case PROMPT_SEQUENCE_MODE:
 		announceRadioMode(voicePromptWasPlaying);
@@ -2547,9 +2515,6 @@ void announceItemWithInit(bool init, voicePromptItem_t item, audioPromptThreshol
 		voicePromptsAppendPrompt(PROMPT_TRANSMIT);
 		announceFrequencyEx(false, false, true);
 		break;
-<<<<<<< HEAD
-	}
-=======
 	case PROMPT_SEQUENCE_BANDWIDTH:
 		announceBandWidth(voicePromptWasPlaying);
 		break;
@@ -2563,7 +2528,6 @@ void announceItemWithInit(bool init, voicePromptItem_t item, audioPromptThreshol
 	case PROMPT_SEQUENCE_CHANNEL_NUMBER_AND_NAME:
 		announceChannelName(!voicePromptWasPlaying, true);
 		break;
->>>>>>> development
 	default:
 		break;
 	}
@@ -2760,36 +2724,6 @@ bool repeatVoicePromptOnSK1(uiEvent_t *ev)
 	return false;
 }
 
-<<<<<<< HEAD
-void AnnounceChannelSummary(bool voicePromptWasPlaying)
-{
-		char voiceBuf[17];
-	char voiceBufChNumber[5];
-	int channelNumber = CODEPLUG_ZONE_IS_ALLCHANNELS(currentZone) ? nonVolatileSettings.currentChannelIndexInAllZone : (nonVolatileSettings.currentChannelIndexInZone+1);
-
-	codeplugUtilConvertBufToString(currentChannelData->name, voiceBuf, 16);
-	snprintf(voiceBufChNumber, 5, "%d", channelNumber);
-
-	voicePromptsInit();
-	voicePromptsAppendPrompt(PROMPT_CHANNEL);
-	// If the number and name differ, then append.
-	if (strncmp(voiceBufChNumber, voiceBuf, strlen(voiceBufChNumber)) != 0)
-	{
-		voicePromptsAppendString(voiceBufChNumber);
-		voicePromptsAppendPrompt(PROMPT_SILENCE);
-	}
-	voicePromptsAppendString(voiceBuf);
-
-	if (nonVolatileSettings.audioPromptMode == AUDIO_PROMPT_MODE_VOICE_LEVEL_3)
-	{
-		announceRadioMode(voicePromptWasPlaying);
-	}
-	voicePromptsAppendPrompt(PROMPT_SILENCE);
-
-	announceFrequency();
-	voicePromptsAppendPrompt(PROMPT_SILENCE);
-
-=======
 void AnnounceChannelSummary(bool voicePromptWasPlaying, bool announceName)
 {
 	bool isChannelScreen=menuSystemGetCurrentMenuNumber() == UI_CHANNEL_MODE;
@@ -2820,7 +2754,6 @@ void AnnounceChannelSummary(bool voicePromptWasPlaying, bool announceName)
 
 	voicePromptsAppendPrompt(PROMPT_SILENCE);
 	
->>>>>>> development
 	if (trxGetMode() == RADIO_MODE_DIGITAL)
 	{
 		announceContactNameTgOrPc(voicePromptsIsPlaying());
@@ -2849,21 +2782,11 @@ void AnnounceChannelSummary(bool voicePromptWasPlaying, bool announceName)
 			buildCSSCodeVoicePrompts(currentChannelData->txTone,
 			(isCTCSS ? CSS_TYPE_CTCSS : ((currentChannelData->txTone & CSS_TYPE_DCS_MASK ) ? CSS_TYPE_DCS_INVERTED : CSS_TYPE_DCS)), DIRECTION_TRANSMIT, true);
 		}
-<<<<<<< HEAD
-=======
 		voicePromptsAppendPrompt(PROMPT_SILENCE);
->>>>>>> development
 	}
 
 	voicePromptsAppendPrompt(PROMPT_SILENCE);
 	announcePowerLevel(voicePromptWasPlaying);
-<<<<<<< HEAD
-	if (currentChannelData->libreDMR_Power == 0)
-	{
-		voicePromptsAppendLanguageString(&currentLanguage->from_master);
-	}
-
-=======
 	if (isChannelScreen)
 	{
 		if (currentChannelData->libreDMR_Power == 0)
@@ -2873,7 +2796,6 @@ void AnnounceChannelSummary(bool voicePromptWasPlaying, bool announceName)
 
 		announceZoneName(voicePromptWasPlaying);
 	}
->>>>>>> development
 	voicePromptsPlay();
 }
 

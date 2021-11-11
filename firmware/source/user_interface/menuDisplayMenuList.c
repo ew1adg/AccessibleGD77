@@ -60,19 +60,6 @@ menuStatus_t menuDisplayMenuList(uiEvent_t *ev, bool isFirstRun)
 		}
 
 		voicePromptsInit();
-<<<<<<< HEAD
-		switch (menuSystemGetCurrentMenuNumber())
-		{
-			case MENU_CONTACTS_MENU:
-				voicePromptsAppendLanguageString(&currentLanguage->contacts);
-				if (nonVolatileSettings.audioPromptMode > AUDIO_PROMPT_MODE_VOICE_LEVEL_2)
-				{
-					voicePromptsAppendLanguageString(&currentLanguage->menu);
-				}
-				break;
-			default:
-				voicePromptsAppendLanguageString(&currentLanguage->menu);
-=======
 		if (menuName)
 		{
 			voicePromptsAppendLanguageString((const char * const *)menuName);
@@ -80,7 +67,6 @@ menuStatus_t menuDisplayMenuList(uiEvent_t *ev, bool isFirstRun)
 		if (!menuName || nonVolatileSettings.audioPromptMode > AUDIO_PROMPT_MODE_VOICE_LEVEL_2)
 		{
 			voicePromptsAppendLanguageString(&currentLanguage->menu);
->>>>>>> development
 		}
 		voicePromptsAppendPrompt(PROMPT_SILENCE);
 

@@ -133,13 +133,10 @@ bool uiVFOModeFrequencyScanningIsActiveAndEnabled(uint32_t *lowFreq, uint32_t *h
  HeaderScanIndicatorType_t uiVFOGetHeaderScanIndicatorType();
 void uiChannelModeStopScanning(void);
 bool uiChannelModeIsScanning(void);
-<<<<<<< HEAD
-=======
 
 void uiChannelInitializeCurrentZone(void);
 
 
->>>>>>> development
 void uiCPSUpdate(uiCPSCommand_t command, int x, int y, ucFont_t fontSize, ucTextAlign_t alignment, bool isInverted, char *szMsg);
 
 void menuSystemInit(void);
@@ -240,12 +237,9 @@ enum MENU_SCREENS
 	UI_PRIVATE_CALL,
 	UI_MESSAGE_BOX,
 	MENU_CONTACT_NEW_DTMF,
-<<<<<<< HEAD
-=======
 	MENU_LAST_HEARD_SUBMENU,
 	MENU_AUTOZONE,
 	MENU_RADIO_DETAILS,
->>>>>>> development
 	NUM_MENU_ENTRIES
 };
 
