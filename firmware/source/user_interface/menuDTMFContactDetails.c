@@ -32,6 +32,7 @@
 #include "user_interface/menuSystem.h"
 #include "user_interface/uiUtilities.h"
 #include "user_interface/uiLocalisation.h"
+<<<<<<< HEAD
 
 #define DTMF_CODE_MAX_LEN 16 // should match the max size of the struct_codeplugDTMFContact_t .code field in codeplug.h.
 #define DTMF_NAME_MAX_LEN 16 // should match the max size of the struct_codeplugDTMFContact_t .name field in codeplug.h.
@@ -39,6 +40,13 @@
 
 static void updateScreen(bool isFirstRun, bool updateScreen);
 static void updateCursor(bool moved);
+=======
+#include "user_interface/editHandler.h"
+
+#define MAX_CHAR_BUF_LEN 33 // include null.
+
+static void updateScreen(bool isFirstRun, bool updateScreen);
+>>>>>>> development
 static void handleEvent(uiEvent_t *ev);
 
 static menuStatus_t menuDTMFContactDetailsExitCode = MENU_STATUS_SUCCESS;
@@ -63,6 +71,35 @@ static int menuDTMFContactDetailsTimeout;
 
 enum MENU_DTMF_CONTACT_DETAILS_STATE { MENU_DTMF_CONTACT_DETAILS_DISPLAY = 0, MENU_DTMF_CONTACT_DETAILS_SAVED, MENU_DTMF_CONTACT_DETAILS_EXISTS };
 
+<<<<<<< HEAD
+=======
+static void SetEditParamsForMenuIndex()
+{
+	switch(menuDataGlobal.currentItemIndex)
+	{
+		case CONTACT_DETAILS_NAME:
+			keypadAlphaEnable = true;
+			editParams.editFieldType=EDIT_TYPE_ALPHANUMERIC;
+			editParams.editBuffer=contactName;
+			editParams.cursorPos=&namePos;
+			editParams.maxLen=DTMF_NAME_MAX_LEN+1;
+			editParams.xPixelOffset=5*8; // name or code plus colon * 8 pixels.
+			editParams.yPixelOffset=0; // use menu default.
+			break;
+		case CONTACT_DETAILS_DTMF_CODE:
+			keypadAlphaEnable = false;
+			editParams.editFieldType=EDIT_TYPE_DTMF_CHARS;
+			editParams.editBuffer=dtmfCodeChars;
+			editParams.cursorPos=&codePos;
+			editParams.maxLen=DTMF_CODE_MAX_LEN+1;
+			editParams.xPixelOffset=5*8; // name or code plus colon * 8 pixels.
+			editParams.yPixelOffset=0; // use menu default.
+			break;
+	}		
+	*editParams.cursorPos = SAFE_MIN(strlen(editParams.editBuffer), editParams.maxLen-1); // place cursor at end.
+}
+
+>>>>>>> development
 static bool DTMFContactExists(char* name)
 {
 	if (!name || !*name) return false;
@@ -88,6 +125,7 @@ static bool DTMFContactExists(char* name)
 	return false;
 	}
 
+<<<<<<< HEAD
 static const char *DTMF_AllowedChars = "0123456789ABCD*#"; // The order is mandatory
 
 static bool ConvertDTMFToChars(uint8_t *code, char *text, int maxSize)
@@ -131,10 +169,17 @@ static bool ConvertCharsToDTMFCode(char *text, uint8_t *code, int maxSize)
 	return true;
 }
 
+=======
+>>>>>>> development
 menuStatus_t menuDTMFContactDetails(uiEvent_t *ev, bool isFirstRun)
 {
 	if (isFirstRun)
 	{
+<<<<<<< HEAD
+=======
+		menuDTMFContactDetailsTimeout = 0;
+		
+>>>>>>> development
 		voicePromptsInit();
 
 		if (uiDataGlobal.currentSelectedContactIndex == 0)
@@ -161,7 +206,11 @@ menuStatus_t menuDTMFContactDetails(uiEvent_t *ev, bool isFirstRun)
 
 			memcpy(&tmpDTMFContact, &contactListDTMFContactData, CODEPLUG_DTMF_CONTACT_DATA_STRUCT_SIZE);
 
+<<<<<<< HEAD
 			ConvertDTMFToChars(tmpDTMFContact.code, dtmfCodeChars, DTMF_CODE_MAX_LEN); // convert the dtmfCode to numbers and letters.
+=======
+			dtmfConvertCodeToChars(tmpDTMFContact.code, dtmfCodeChars, DTMF_CODE_MAX_LEN); // convert the dtmfCode to numbers and letters.
+>>>>>>> development
 			codeplugUtilConvertBufToString(tmpDTMFContact.name, contactName, DTMF_NAME_MAX_LEN);
 
 			namePos = strlen(contactName);
@@ -173,17 +222,30 @@ menuStatus_t menuDTMFContactDetails(uiEvent_t *ev, bool isFirstRun)
 		menuDTMFContactDetailsState = MENU_DTMF_CONTACT_DETAILS_DISPLAY;
 		menuDataGlobal.currentItemIndex = CONTACT_DETAILS_NAME;
 		menuDataGlobal.endIndex = NUM_DTMF_CONTACT_DETAILS_ITEMS;
+<<<<<<< HEAD
 
 		updateScreen(isFirstRun, true);
 		updateCursor(true);
 
 		return (MENU_STATUS_LIST_TYPE | MENU_STATUS_SUCCESS);
+=======
+		SetEditParamsForMenuIndex();
+
+		updateScreen(isFirstRun, true);
+		editUpdateCursor(&editParams, true, true);
+			return (MENU_STATUS_LIST_TYPE | MENU_STATUS_SUCCESS);
+>>>>>>> development
 	}
 	else
 	{
 		menuDTMFContactDetailsExitCode = MENU_STATUS_SUCCESS;
 
+<<<<<<< HEAD
 		updateCursor(false);
+=======
+		editUpdateCursor(&editParams, false, true);
+	
+>>>>>>> development
 		if (ev->hasEvent || (menuDTMFContactDetailsTimeout > 0))
 		{
 			handleEvent(ev);
@@ -192,6 +254,7 @@ menuStatus_t menuDTMFContactDetails(uiEvent_t *ev, bool isFirstRun)
 	return menuDTMFContactDetailsExitCode;
 }
 
+<<<<<<< HEAD
 static void updateCursor(bool moved)
 {
 	switch (menuDataGlobal.currentItemIndex)
@@ -205,6 +268,8 @@ static void updateCursor(bool moved)
 	}
 }
 
+=======
+>>>>>>> development
 static void updateScreen(bool isFirstRun, bool allowedToSpeakUpdate)
 {
 	int mNum = 0;
@@ -229,6 +294,7 @@ static void updateScreen(bool isFirstRun, bool allowedToSpeakUpdate)
 
 	menuDisplayTitle(buf);
 
+<<<<<<< HEAD
 	if (menuDataGlobal.currentItemIndex == CONTACT_DETAILS_NAME)
 	{
 		keypadAlphaEnable = true;
@@ -238,6 +304,8 @@ static void updateScreen(bool isFirstRun, bool allowedToSpeakUpdate)
 		keypadAlphaEnable = false;
 	}
 
+=======
+>>>>>>> development
 	switch (menuDTMFContactDetailsState)
 	{
 		case MENU_DTMF_CONTACT_DETAILS_DISPLAY:
@@ -266,7 +334,11 @@ static void updateScreen(bool isFirstRun, bool allowedToSpeakUpdate)
 						strncpy(rightSideVar, contactName, DTMF_NAME_MAX_LEN);
 						break;
 					case CONTACT_DETAILS_DTMF_CODE:
+<<<<<<< HEAD
 						leftSide = (char * const *)&currentLanguage->dtmf_entry;
+=======
+						leftSide = (char * const *)&currentLanguage->dtmf_code;
+>>>>>>> development
 						strncpy(rightSideVar, dtmfCodeChars, DTMF_CODE_MAX_LEN);
 						break;
 				}
@@ -332,8 +404,11 @@ static void updateScreen(bool isFirstRun, bool allowedToSpeakUpdate)
 
 static void handleEvent(uiEvent_t *ev)
 {
+<<<<<<< HEAD
 	int sLen = strlen(dtmfCodeChars);
 
+=======
+>>>>>>> development
 	if (ev->events & BUTTON_EVENT)
 	{
 		if (repeatVoicePromptOnSK1(ev))
@@ -353,12 +428,17 @@ static void handleEvent(uiEvent_t *ev)
 				if (KEYCHECK_PRESS(ev->keys, KEY_DOWN))
 				{
 					menuSystemMenuIncrement(&menuDataGlobal.currentItemIndex, NUM_DTMF_CONTACT_DETAILS_ITEMS);
+<<<<<<< HEAD
+=======
+					SetEditParamsForMenuIndex();
+>>>>>>> development
 					updateScreen(false, true);
 					menuDTMFContactDetailsExitCode |= MENU_STATUS_LIST_TYPE;
 				}
 				else if (KEYCHECK_PRESS(ev->keys, KEY_UP))
 				{
 					menuSystemMenuDecrement(&menuDataGlobal.currentItemIndex, NUM_DTMF_CONTACT_DETAILS_ITEMS);
+<<<<<<< HEAD
 					updateScreen(false, true);
 					menuDTMFContactDetailsExitCode |= MENU_STATUS_LIST_TYPE;
 				}
@@ -421,6 +501,17 @@ static void handleEvent(uiEvent_t *ev)
 							break;
 					}
 					updateScreen(false, allowedToSpeakUpdate);
+=======
+					SetEditParamsForMenuIndex();
+					updateScreen(false, true);
+					menuDTMFContactDetailsExitCode |= MENU_STATUS_LIST_TYPE;
+				}
+				else if (HandleEditEvent(ev, &editParams))
+				{
+					updateScreen(false, editParams.allowedToSpeakUpdate);
+					editUpdateCursor(&editParams, true, true);
+					return;
+>>>>>>> development
 				}
 				else if (KEYCHECK_SHORTUP(ev->keys, KEY_GREEN))
 				{
@@ -441,7 +532,11 @@ static void handleEvent(uiEvent_t *ev)
 					memset(tmpDTMFContact.code, 0xFFU, DTMF_CODE_MAX_LEN);
 
 					codeplugUtilConvertStringToBuf(contactName, tmpDTMFContact.name, DTMF_NAME_MAX_LEN);
+<<<<<<< HEAD
 					ConvertCharsToDTMFCode(dtmfCodeChars, tmpDTMFContact.code, DTMF_CODE_MAX_LEN);
+=======
+					dtmfConvertCharsToCode(dtmfCodeChars, tmpDTMFContact.code, DTMF_CODE_MAX_LEN);
+>>>>>>> development
 
 					if (((dtmfContactDetailsIndex >= CODEPLUG_DTMF_CONTACTS_MIN) && (dtmfContactDetailsIndex <= CODEPLUG_DTMF_CONTACTS_MAX))
 						&& (tmpDTMFContact.name[0]!=0xFFU) && (tmpDTMFContact.code[0] != 0xFFU))
@@ -461,6 +556,7 @@ static void handleEvent(uiEvent_t *ev)
 					menuSystemPopPreviousMenu();
 					return;
 				}
+<<<<<<< HEAD
 				else
 				{
 					if (menuDataGlobal.currentItemIndex == CONTACT_DETAILS_DTMF_CODE)
@@ -516,6 +612,8 @@ static void handleEvent(uiEvent_t *ev)
 						}
 					}
 				}
+=======
+>>>>>>> development
 			}
 			break;
 
@@ -523,6 +621,10 @@ static void handleEvent(uiEvent_t *ev)
 			menuDTMFContactDetailsTimeout--;
 			if ((menuDTMFContactDetailsTimeout == 0) || KEYCHECK_SHORTUP(ev->keys, KEY_GREEN) || KEYCHECK_SHORTUP(ev->keys, KEY_RED))
 			{
+<<<<<<< HEAD
+=======
+				menuDTMFContactDetailsTimeout=0;
+>>>>>>> development
 				menuSystemPopPreviousMenu();
 				return;
 			}
