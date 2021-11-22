@@ -175,7 +175,6 @@ void promptsPlayNotAfterTx(void);
 void playNextSettingSequence(void);
 void uiUtilityBuildTgOrPCDisplayName(char *nameBuf, int bufferLen);
 void acceptPrivateCall(uint32_t id, int timeslot);
-bool rebuildVoicePromptOnExtraLongSK1(uiEvent_t *ev);
 bool repeatVoicePromptOnSK1(uiEvent_t *ev);
 void AnnounceChannelSummary(bool voicePromptWasPlaying, bool announceName);
 bool handleMonitorMode(uiEvent_t *ev);
@@ -206,5 +205,6 @@ bool IsBitSet(uint8_t bits, int whichBit);
 void SetBit(uint8_t* bits, int whichBit, bool set);
 
 void resetOriginalSettingsData(void);
-
+void AnnounceLastHeardContact();
+void AnnounceLastHeardContactIfNeeded();
 #endif

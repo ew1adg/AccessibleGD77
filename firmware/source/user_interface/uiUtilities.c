@@ -53,6 +53,11 @@ static uint32_t lastTG = 0;
 
 volatile uint32_t lastID = 0;// This needs to be volatile as lastHeardClearLastID() is called from an ISR
 LinkItem_t *LinkHead = callsList;
+static uint32_t lastHeardNeedsAnnouncementTimer=-1; //reset is -1.
+static uint32_t lastHeardUpdateTime=0;
+// Try and avoid triggering speaking of last heard if reception breaks up, wait 750 ms after end of reception.
+#define LAST_HEARD_TIMER_TIMEOUT 750
+
 static void announceChannelNameOrVFOFrequency(bool voicePromptWasPlaying, bool announceVFOName);
 static void dmrDbTextDecode(uint8_t *compressedBufIn, uint8_t *decompressedBufOut, int compressedSize);
 
@@ -593,7 +598,7 @@ bool lastHeardListUpdate(uint8_t *dmrDataBuffer, bool forceOnHotspot)
 					memset(bufferTA, 0, 32);// Clear any TA data in TA buffer (used for decode)
 					blocksTA = 0x00;
 					overrideTA = false;
-
+					lastHeardNeedsAnnouncementTimer = (id !=trxDMRID) ? LAST_HEARD_TIMER_TIMEOUT : -1;
 					retVal = true;// something has changed
 					lastID = id;
 
@@ -609,6 +614,7 @@ bool lastHeardListUpdate(uint8_t *dmrDataBuffer, bool forceOnHotspot)
 						}
 
 						item->time = fw_millis();
+						lastHeardUpdateTime=item->time;
 						lastTG = talkGroupOrPcId;
 
 						if (item == LinkHead)
@@ -671,6 +677,7 @@ bool lastHeardListUpdate(uint8_t *dmrDataBuffer, bool forceOnHotspot)
 						item->id = id;
 						item->talkGroupOrPcId = talkGroupOrPcId;
 						item->time = fw_millis();
+						lastHeardUpdateTime=item->time;
 						item->receivedTS = (dmrMonitorCapturedTS != -1) ? dmrMonitorCapturedTS : trxGetDMRTimeSlot();
 						lastTG = talkGroupOrPcId;
 
@@ -699,6 +706,7 @@ bool lastHeardListUpdate(uint8_t *dmrDataBuffer, bool forceOnHotspot)
 							item->talkGroupOrPcId = talkGroupOrPcId;// update the TG in case they changed TG
 							updateLHItem(item);
 							item->time = fw_millis();
+							lastHeardUpdateTime=item->time;
 						}
 
 						lastTG = talkGroupOrPcId;
@@ -2423,7 +2431,7 @@ void announceItemWithInit(bool init, voicePromptItem_t item, audioPromptThreshol
 		{
 			announceZoneName(voicePromptWasPlaying);
 		}
-
+		AnnounceLastHeardContact();
 		announceChannelNameOrVFOFrequency(voicePromptWasPlaying, (voicePromptSequenceState != PROMPT_SEQUENCE_VFO_FREQ_UPDATE));
 		if (uiVFOModeFrequencyScanningIsActiveAndEnabled(&lFreq, &hFreq))
 		{
@@ -2628,68 +2636,6 @@ void acceptPrivateCall(uint32_t id, int timeslot)
 	announceItem(PROMPT_SEQUENCE_CONTACT_TG_OR_PC,PROMPT_THRESHOLD_3);
 }
 
-bool rebuildVoicePromptOnExtraLongSK1(uiEvent_t *ev)
-{
-	if (BUTTONCHECK_EXTRALONGDOWN(ev, BUTTON_SK1) && (BUTTONCHECK_DOWN(ev, BUTTON_SK2) == 0) && (BUTTONCHECK_SHORTUP(ev, BUTTON_SK2) == 0) && (ev->keys.key == 0))
-	{
-		// SK2 is still held down, but SK1 just get released.
-		if (uiDataGlobal.reverseRepeater)
-		{
-			return false;
-		}
-
-		if (nonVolatileSettings.audioPromptMode >= AUDIO_PROMPT_MODE_VOICE_LEVEL_1)
-		{
-			int currentMenu = menuSystemGetCurrentMenuNumber();
-
-			if ((((currentMenu == UI_CHANNEL_MODE) && (uiDataGlobal.Scan.active && (uiDataGlobal.Scan.state != SCAN_PAUSED))) ||
-					((currentMenu == UI_VFO_MODE) && ((uiDataGlobal.Scan.active && (uiDataGlobal.Scan.state != SCAN_PAUSED)) || uiDataGlobal.Scan.toneActive))) == false)
-			{
-				if (voicePromptsIsPlaying())
-				{
-					voicePromptsTerminate();
-				}
-				else
-				{
-					announceItem(((currentMenu == UI_VFO_MODE) ?
-							PROMPT_SEQUENCE_CHANNEL_NAME_AND_CONTACT_OR_VFO_FREQ_AND_MODE_AND_TS_AND_CC : PROMPT_SEQUENCE_ZONE_NAME_CHANNEL_NAME_AND_CONTACT_OR_VFO_FREQ_AND_MODE_AND_TS_AND_CC),
-							PROMPT_THRESHOLD_NEVER_PLAY_IMMEDIATELY);
-
-					if (trxGetMode() == RADIO_MODE_ANALOG)
-					{
-						CodeplugCSSTypes_t type = codeplugGetCSSType(currentChannelData->rxTone);
-						if ((type & CSS_TYPE_NONE) == 0)
-						{
-							buildCSSCodeVoicePrompts(currentChannelData->rxTone, type, DIRECTION_RECEIVE, true);
-							voicePromptsAppendPrompt(PROMPT_SILENCE);
-						}
-
-						type = codeplugGetCSSType(currentChannelData->txTone);
-						if ((type & CSS_TYPE_NONE) == 0)
-						{
-							buildCSSCodeVoicePrompts(currentChannelData->txTone, type, DIRECTION_TRANSMIT, true);
-							voicePromptsAppendPrompt(PROMPT_SILENCE);
-						}
-					}
-
-					announceItemWithInit(false, PROMPT_SEQUENCE_POWER, PROMPT_THRESHOLD_NEVER_PLAY_IMMEDIATELY);
-
-					if (currentMenu == UI_VFO_MODE)
-					{
-						announceItemWithInit(false, (uiVFOModeIsTXFocused() ? PROMPT_SEQUENCE_DIRECTION_TX : PROMPT_SEQUENCE_DIRECTION_RX), PROMPT_THRESHOLD_NEVER_PLAY_IMMEDIATELY);
-					}
-
-					voicePromptsPlay();
-				}
-
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
 bool repeatVoicePromptOnSK1(uiEvent_t *ev)
 {
 	if (BUTTONCHECK_SHORTUP(ev, BUTTON_SK1) && (BUTTONCHECK_DOWN(ev, BUTTON_SK2) == 0) && (ev->keys.key == 0))
@@ -2729,6 +2675,7 @@ void AnnounceChannelSummary(bool voicePromptWasPlaying, bool announceName)
 	bool isChannelScreen=menuSystemGetCurrentMenuNumber() == UI_CHANNEL_MODE;
 	
 	voicePromptsInit();
+	AnnounceLastHeardContact();
 	if (announceName)
 	{
 		announceChannelName(true, true);
@@ -3619,4 +3566,93 @@ bool IsBitSet(uint8_t bits, int whichBit)
 		*bits&=~bit;
 }
 
+static bool IsLastHeardContactRelevant()
+{
+	if (!LinkHead) return false;
+	if (LinkHead->id==0) return false;
+	if (LinkHead->id==trxDMRID) return false; // one's own ID.
+	if ((fw_millis() - lastHeardUpdateTime) > 10000) return false; // If it is older than 10 seconds.
+	if (trxGetMode()==RADIO_MODE_ANALOG) return false;
+	
+	return true;
+}
 
+void AnnounceLastHeardContact()
+{
+	if (!IsLastHeardContactRelevant()) return;
+	
+	uint8_t offset=0;
+	if (strncmp(LinkHead->contact, "ID:", 3)==0 && LinkHead->contact[3])
+	{
+		offset=3;
+	}
+	char buffer[MAX_DMR_ID_CONTACT_TEXT_LENGTH]="\0";
+	if (LinkHead->talkerAlias[0])
+		strcpy(buffer, LinkHead->talkerAlias);
+	else if (LinkHead->contact[0])
+		strcpy(buffer, LinkHead->contact+offset);
+	// terminate at first space so we only read the callsign or first piece of data.
+	int endOffset=0;
+	while (buffer[endOffset] && buffer[endOffset]!=' ')
+	{
+		endOffset++;
+	}
+	if (endOffset)
+		buffer[endOffset]='\0';
+	if (buffer[0])
+		voicePromptsAppendString(buffer);
+	else
+		voicePromptsAppendInteger(LinkHead->id);
+	uint32_t tg = (LinkHead->talkGroupOrPcId & 0xFFFFFF);
+	
+	if ((trxTalkGroupOrPcId != tg) && (LinkHead->talkgroup[0]))
+	{
+		voicePromptsAppendString(LinkHead->talkgroup);
+	}
+}
+
+void AnnounceLastHeardContactIfNeeded()
+{
+	if (lastHeardNeedsAnnouncementTimer ==-1) return;
+
+	if (!IsLastHeardContactRelevant()) return;
+	
+	if (voicePromptsIsPlaying()) return;
+	
+	if (trxIsTransmitting)
+	{
+		lastHeardNeedsAnnouncementTimer = -1;
+		return;
+	}
+// at this point, if we have detected that the DMR ID has changed, queue it for speaking but do not speak it until reception has finished.
+// If we don't queue it, sk1 will still speak the old callsign if pressed.
+	if (lastHeardNeedsAnnouncementTimer==LAST_HEARD_TIMER_TIMEOUT)
+	{
+		voicePromptsInit();
+		AnnounceLastHeardContact(); // just queue, do not play.
+		lastHeardNeedsAnnouncementTimer--; // so we do  not do it again until it changes.
+	}
+	
+	if (getAudioAmpStatus() & (AUDIO_AMP_MODE_RF | AUDIO_AMP_MODE_BEEP | AUDIO_AMP_MODE_PROMPT))
+	{// wait till reception has finished.
+		lastHeardNeedsAnnouncementTimer=LAST_HEARD_TIMER_TIMEOUT-1; // avoid requeueing the DMR ID unless it actually changes.
+		lastHeardUpdateTime=fw_millis();
+		return;
+	}
+	
+	if (lastHeardNeedsAnnouncementTimer > 0)
+	{
+		lastHeardNeedsAnnouncementTimer--;
+		return; // wait for timer to expire, start counting  after end of transmission.
+	}
+
+	lastHeardNeedsAnnouncementTimer=-1; // reset.
+	lastHeardUpdateTime=fw_millis(); // start from now because last TX may have been longer than our timeout!
+	if ((nonVolatileSettings.audioPromptMode < 1) || (nonVolatileSettings.bitfieldOptions&BIT_ANNOUNCE_LASTHEARD)==0)
+		return;// Don't automatically announce it.
+	voicePromptsInit();
+
+	AnnounceLastHeardContact();
+	
+	voicePromptsPlay();
+}
