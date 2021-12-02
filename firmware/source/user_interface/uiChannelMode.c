@@ -736,7 +736,6 @@ static void scanSearchForNextChannel(void)
 	}
 #endif
 
-	int channel = 0;
 	int curChannelIndex=nextChannelIndex;
 	// All Channels virtual zone
 	if (CODEPLUG_ZONE_IS_ALLCHANNELS(currentZone))
@@ -757,7 +756,6 @@ static void scanSearchForNextChannel(void)
 			codeplugChannelGetDataWithOffsetAndLengthForIndex(nextChannelIndex, &channelNextChannelData, CODEPLUG_CHANNEL_FLAG4_OFFSET, 1);
 		} while (CODEPLUG_CHANNEL_IS_FLAG_SET(&channelNextChannelData, CODEPLUG_CHANNEL_FLAG_ALL_SKIP));
 
-		channel = nextChannelIndex;
 		codeplugChannelGetDataForIndex(nextChannelIndex, &channelNextChannelData);
 	}
 	else
@@ -776,7 +774,6 @@ static void scanSearchForNextChannel(void)
 
 		} while (CODEPLUG_CHANNEL_IS_FLAG_SET(&channelNextChannelData, CODEPLUG_CHANNEL_FLAG_ZONE_SKIP));
 
-		channel = currentZone.channels[nextChannelIndex];
 		codeplugChannelGetDataForIndex(currentZone.channels[nextChannelIndex], &channelNextChannelData);
 	}
 
@@ -789,7 +786,7 @@ static void scanSearchForNextChannel(void)
 		}
 		else
 		{
-			if(uiDataGlobal.Scan.nuisanceDelete[i] == channel)
+			if(uiDataGlobal.Scan.nuisanceDelete[i] == channelNextChannelData.rxFreq)
 			{
 				return;
 			}
@@ -1234,7 +1231,7 @@ static void handleEvent(uiEvent_t *ev)
 					uiDataGlobal.Scan.lastIteration = true;
 				}
 
-				uiDataGlobal.Scan.nuisanceDelete[uiDataGlobal.Scan.nuisanceDeleteIndex] = uiDataGlobal.currentSelectedChannelNumber;
+				uiDataGlobal.Scan.nuisanceDelete[uiDataGlobal.Scan.nuisanceDeleteIndex] = currentChannelData->rxFreq;
 				uiDataGlobal.Scan.nuisanceDeleteIndex = (uiDataGlobal.Scan.nuisanceDeleteIndex + 1) % MAX_ZONE_SCAN_NUISANCE_CHANNELS;
 				uiDataGlobal.Scan.timer = SCAN_SKIP_CHANNEL_INTERVAL;	//force scan to continue;
 				uiDataGlobal.Scan.state = SCAN_SCANNING;
@@ -2070,9 +2067,10 @@ static void selectPrevNextZone(bool nextZone)
 	tsSetManualOverride(CHANNEL_CHANNEL, TS_NO_OVERRIDE);// remove any TS override
 */
 	if (!scanAllZones)
+	{
 		settingsSet(nonVolatileSettings.currentChannelIndexInZone, settingsGetCurrentChannelIndexForZone(nonVolatileSettings.currentZone));
-	currentChannelData->rxFreq = 0x00; // Flag to the Channel screen that the channel data is now invalid and needs to be reloaded
-	
+		currentChannelData->rxFreq = 0x00; // Flag to the Channel screen that the channel data is now invalid and needs to be reloaded
+	}
 	codeplugZoneGetDataForNumber(nonVolatileSettings.currentZone, &currentZone);
 	EnsurePriorityChannelIsSet();
 	uiDataGlobal.priorityChannelActive=false;
@@ -2094,7 +2092,18 @@ static void handleUpKey(uiEvent_t *ev)
 			if (!uiDataGlobal.Scan.active)
 			{
 				StopDualWatch(true); // change to regular scan.
-				scanStart(true);
+				if (nonVolatileSettings.audioPromptMode >= AUDIO_PROMPT_MODE_VOICE_LEVEL_2)
+				{
+					voicePromptsInit();
+					voicePromptsAppendLanguageString(&currentLanguage->scan);
+					if (scanAllZones)
+						voicePromptsAppendLanguageString(&currentLanguage->all);
+					else
+						voicePromptsAppendLanguageString(&currentLanguage->zone);
+
+					voicePromptsPlay();
+				}
+				scanStart(nonVolatileSettings.audioPromptMode < AUDIO_PROMPT_MODE_VOICE_LEVEL_2);
 			}
 			return;
 		}
@@ -2736,11 +2745,6 @@ static void scanStart(bool longPressBeep)
 		return;
 	}
 
-	if (voicePromptsIsPlaying())
-	{
-		voicePromptsTerminate();
-	}
-
 	directChannelNumber = 0;
 	uiDataGlobal.Scan.direction = 1;
 
@@ -2830,6 +2834,7 @@ static void updateTrxID(void)
 
 static void scanning(void)
 {
+	if (voicePromptsIsPlaying()) return;
 	// If Dual Watch is active, only hold and pause are relevant since we want to continue watching both channels until cancelled.
 	int scanMode=nonVolatileSettings.scanModePause;
 	if (dualWatchChannelData.dualWatchActive && scanMode==SCAN_MODE_STOP )
@@ -2944,7 +2949,7 @@ void uiChannelModeStopScanning(void)
 	if (uiDataGlobal.Scan.state == SCAN_SCANNING)
 	{
 		if ((scanStartZone!=NO_ZONE) && (scanStartZone !=nonVolatileSettings.currentZone))
-		{//joe
+		{
 			settingsSet(nonVolatileSettings.currentZone, scanStartZone);
 			currentChannelData->rxFreq = 0x00; // Flag to the Channel screen that the channel data is now invalid and needs to be reloaded
 	
@@ -4798,7 +4803,7 @@ if (GD77SParameters.cycleFunctionsInReverse && BUTTONCHECK_DOWN(ev, BUTTON_SK1)=
 							{
 								uiDataGlobal.Scan.lastIteration = true;
 							}
-							uiDataGlobal.Scan.nuisanceDelete[uiDataGlobal.Scan.nuisanceDeleteIndex] = GD77SParameters.virtualVFOMode ? currentChannelData->rxFreq : uiDataGlobal.currentSelectedChannelNumber;
+							uiDataGlobal.Scan.nuisanceDelete[uiDataGlobal.Scan.nuisanceDeleteIndex] = currentChannelData->rxFreq;
 							uiDataGlobal.Scan.nuisanceDeleteIndex = (uiDataGlobal.Scan.nuisanceDeleteIndex + 1) % MAX_ZONE_SCAN_NUISANCE_CHANNELS;
 							uiDataGlobal.Scan.timer = SCAN_SKIP_CHANNEL_INTERVAL;	//force scan to continue;
 							uiDataGlobal.Scan.state = SCAN_SCANNING;
