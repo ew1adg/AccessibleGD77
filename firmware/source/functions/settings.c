@@ -37,8 +37,8 @@
 #include "functions/rxPowerSaving.h"
 
 static const int STORAGE_BASE_ADDRESS 		= 0x6000;
-// VK7JS updated on Nov 23 2021 after removing autoZone from settings.
-static const int STORAGE_MAGIC_NUMBER 		= 0x2111; // NOTE: never use 0xDEADBEEF, it's reserved value
+// VK7JS updated on Jan 21 2022 for next release.
+static const int STORAGE_MAGIC_NUMBER 		= 0x2201; // NOTE: never use 0xDEADBEEF, it's reserved value
 
 // Bit patterns for DMR Beep
 const uint8_t BEEP_TX_NONE  = 0x00;
@@ -185,8 +185,6 @@ bool settingsLoadSettings(void)
 		// ensure dtmfLatch is set to a sensible value
 	if (nonVolatileSettings.dtmfLatch > 6)
 		nonVolatileSettings.dtmfLatch = 3; // defaults to 1.5 seconds.
-	else if (nonVolatileSettings.dtmfLatch ==1)
-		nonVolatileSettings.dtmfLatch =2; // 1 seconds.
 	uiDataGlobal.priorityChannelIndex=nonVolatileSettings.priorityChannelIndex;
 	if (nonVolatileSettings.vhfOffset==0 || nonVolatileSettings.vhfOffset > 1000)
 		nonVolatileSettings.vhfOffset=600; // repeater offset for 2 m band kHz.
@@ -352,6 +350,7 @@ void settingsRestoreDefaultSettings(void)
 	currentChannelData = &settingsVFOChannel[nonVolatileSettings.currentVFONumber];// Set the current channel data to point to the VFO data since the default screen will be the VFO
 	nonVolatileSettings.voicePromptVolumePercent=100; // max volume.
 	nonVolatileSettings.voicePromptRate=0; // default, no change, each increment of 1 increases by 10%
+	nonVolatileSettings.dtmfVol=10;
 	settingsDirty = true;
 
 	settingsSaveSettings(false);

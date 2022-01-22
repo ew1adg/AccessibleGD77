@@ -362,6 +362,8 @@ menuStatus_t uiChannelMode(uiEvent_t *ev, bool isFirstRun)
 	{
 #if ! defined(PLATFORM_GD77S) // GD77S speech can be triggered in main(), so let it ends.
 		voicePromptsTerminate();
+#else
+		GD77SParameters.channelbankOffset = (nonVolatileSettings.currentChannelIndexInZone/16)*16;
 #endif
 
 		settingsSet(nonVolatileSettings.initialMenuNumber, (uint8_t) UI_CHANNEL_MODE);// This menu.
@@ -1978,8 +1980,8 @@ static void handleEvent(uiEvent_t *ev)
 		else
 		{
 			int keyval = menuGetKeypadKeyValue(ev, true);
-
-			if ((keyval < 10) && (!BUTTONCHECK_DOWN(ev, BUTTON_SK2)))
+			
+			if ((keyval < 10) && (!BUTTONCHECK_DOWN(ev, BUTTON_SK2)) && (!BUTTONCHECK_DOWN(ev, BUTTON_SK1)))
 			{
 				directChannelNumber = (directChannelNumber * 10) + keyval;
 				if (CODEPLUG_ZONE_IS_ALLCHANNELS(currentZone))
@@ -3011,10 +3013,14 @@ void uiChannelInitializeCurrentZone(void)
 #if defined(PLATFORM_GD77S)
 #define GD77S_KEYPAD_BUF_MAX 33
 static int GD77sSelectedCharIndex=0;
+static int GD77sKeypadBankIndex=0;
 static char GD77SKeypadBuffer[GD77S_KEYPAD_BUF_MAX]="\0";
 static int GD77SKeypadPos=0;
+// bank 0 is DTMF symbols.
+#define GD77S_KEYPAD_BANK1_CHARS "ABCDEFGHIJKLMNOP"
+#define GD77S_KEYPAD_BANK2_CHARS "QRSTUVWXYZ+-%*# "
 
-static int GetDTMFContactIndexForZoneAndChannelAutoDial()
+static int GetDTMFContactIndexForZoneAndChannelAutoDial(bool checkIfAlreadyDialled)
 {
 	if (GD77SParameters.dtmfListCount == 0)
 		return 0;
@@ -3022,7 +3028,7 @@ static int GetDTMFContactIndexForZoneAndChannelAutoDial()
 	if (nonVolatileSettings.currentZone > 15) return 0; // can only handle 16 zones (0 to 15)
 	if (trxGetMode() == RADIO_MODE_DIGITAL) return 0; // DTMF dialing disallowed for digital channels.
 	// See if we've already dialled this combination 	
-	if ((GD77SParameters.dialedZones&(1<<nonVolatileSettings.currentZone)) && (GD77SParameters.dialedChannels&(1<<nonVolatileSettings.currentChannelIndexInZone)))
+	if (checkIfAlreadyDialled && ((GD77SParameters.dialedZones&(1<<nonVolatileSettings.currentZone)) && (GD77SParameters.dialedChannels&(1<<nonVolatileSettings.currentChannelIndexInZone))))
 		return 0;
 	
 	char autoDialContactForZoneAndChannel[7];
@@ -3038,6 +3044,9 @@ static int GetDTMFContactIndexForZoneAndChannelAutoDial()
 
 static void ToggleGD77SDTMFAutoDialer(bool announce)
 {
+	if (GetDTMFContactIndexForZoneAndChannelAutoDial(false)==0)
+		return;
+	
 	bool alreadyDialed = (GD77SParameters.dialedZones&(1<<nonVolatileSettings.currentZone)) && (GD77SParameters.dialedChannels&(1<<nonVolatileSettings.currentChannelIndexInZone));
 	// Only toggle the channel bit as there may be more than one channel in this zone with a dtmf contact associated with it.
 	if (alreadyDialed)
@@ -3087,7 +3096,7 @@ bool uiChannelModeTransmitDTMFContactForGD77S(void)
 
 		return false;	
 	}
-	int onceOffChannelContactIndex = GetDTMFContactIndexForZoneAndChannelAutoDial();
+	int onceOffChannelContactIndex = GetDTMFContactIndexForZoneAndChannelAutoDial(true);
 
 	if ((GD77SParameters.uiMode == GD77S_UIMODE_DTMF_CONTACTS) || (onceOffChannelContactIndex > 0))
 	{
@@ -3366,24 +3375,44 @@ static void AnnounceGD77SVoiceParams(bool announceVolume, bool announceRate)
 		snprintf(buf, 5, "%d", nonVolatileSettings.voicePromptRate+1);
 		voicePromptsAppendString(buf);
 	}
+	if (announceVolume && announceRate) // orange button is being pressed to select Voice menu, announce the voice name.
+	{
+		voicePromptsAppendPrompt(PROMPT_SILENCE);
+		voicePromptsAppendLanguageString(&currentLanguage->name);
+		voicePromptsAppendPrompt(PROMPT_VOICE_NAME);
+	}
 	voicePromptsPlay();
 }
 
+static char GetGD77SKeypadChar()
+{
+	if (GD77sSelectedCharIndex < 0 || GD77sSelectedCharIndex > 15)
+		return 0;
+	
+	switch (GD77sKeypadBankIndex)
+	{
+		case 1:
+			return GD77S_KEYPAD_BANK1_CHARS[GD77sSelectedCharIndex];
+		case 2:
+			return GD77S_KEYPAD_BANK2_CHARS[GD77sSelectedCharIndex];
+		default:
+		return DTMF_AllowedChars[GD77sSelectedCharIndex];
+	}
+}
 static void 			AnnounceGD77sKeypadChar(bool init)
 {
 	char buf[2] = {0,0};
-	buf[0]=DTMF_AllowedChars[GD77sSelectedCharIndex];
+	buf[0]=GetGD77SKeypadChar();
 	if (init)
 		voicePromptsInit();
-
-	voicePromptsAppendString(buf);
+	voicePromptsAppendStringWithCaps(buf, false, false, true);
 	voicePromptsPlay();
 }
 
 static void 			AnnounceGD77sKeypadBuffer(void)
 {
 	voicePromptsInit();
-	voicePromptsAppendString(GD77SKeypadBuffer);
+	voicePromptsAppendStringWithCaps(GD77SKeypadBuffer, false, false, true);
 	voicePromptsPlay();
 }
 
@@ -3392,7 +3421,7 @@ static void AddGD77sKeypadChar(void)
 	if (GD77SKeypadPos >=GD77S_KEYPAD_BUF_MAX-1)
 		return;
 	
-	GD77SKeypadBuffer[GD77SKeypadPos++]= DTMF_AllowedChars[GD77sSelectedCharIndex];
+	GD77SKeypadBuffer[GD77SKeypadPos++]= GetGD77SKeypadChar();
 	AnnounceGD77sKeypadChar(true);
 	GD77SKeypadBuffer[GD77SKeypadPos]='\0';
 }
@@ -3806,6 +3835,18 @@ static bool ProcessGD77SKeypadCmd(uiEvent_t *ev)
 		announceItem(PROMPT_SEQUENCE_MODE, PROMPT_THRESHOLD_2);
 		return true;	
 	}
+	if (strncmp(GD77SKeypadBuffer, "*##", 3)==0 && isdigit(GD77SKeypadBuffer[3]))
+	{// save custom voice prompt.
+		int customPromptNumber=atoi(GD77SKeypadBuffer+3);
+		char* phrasePtr=GD77SKeypadBuffer+3;
+		while (phrasePtr && *phrasePtr && isdigit(*phrasePtr))
+		{
+			phrasePtr++;
+		}
+		SaveCustomVoicePrompt(customPromptNumber, phrasePtr);
+		return true;
+	}
+
 	if (strncmp(GD77SKeypadBuffer, "*#", 2)==0 && strlen(GD77SKeypadBuffer) >= 8)
 	{// Add a DTMF contact name is first 6 chars after *#, code is rest of string.
 		char name[7]="\0";
@@ -3984,6 +4025,28 @@ static bool ProcessGD77SKeypadCmd(uiEvent_t *ev)
 		SaveChannelToCurrentZone(zoneChannelIndex);
 		return true;
 	}
+	if (GD77SKeypadBuffer[0]=='E' && isdigit(GD77SKeypadBuffer[1]) && strlen(GD77SKeypadBuffer) > 2)
+	{// e1 through e16 edit channel name 
+		int zoneChannelIndex = atoi(GD77SKeypadBuffer+1);
+		char* namePtr=GD77SKeypadBuffer+1;
+		while (namePtr && *namePtr && isdigit(*namePtr))
+		{
+			namePtr++;
+		}
+		// copy the name to the specific channel.
+		if (zoneChannelIndex < 1 || zoneChannelIndex > 16)
+		{
+			soundSetMelody(MELODY_ERROR_BEEP);
+			return true;	
+		}
+		codeplugChannelGetDataForIndex(currentZone.channels[zoneChannelIndex-1], currentChannelData);
+		codeplugUtilConvertStringToBuf(namePtr, currentChannelData->name, 16);
+		codeplugChannelSaveDataForIndex(currentZone.channels[zoneChannelIndex-1], currentChannelData);
+		voicePromptsInit();
+		voicePromptsAppendString(namePtr);
+		voicePromptsPlay();
+		return true;
+	}
 	
 	return false;	
 }
@@ -4010,14 +4073,22 @@ static bool HandleGD77sKbdEvent(uiEvent_t *ev)
 	{
 		AddGD77sKeypadChar();
 	}
+	else if (BUTTONCHECK_SHORTUP(ev, BUTTON_SK2))
+	{
+		if (GD77sKeypadBankIndex==2)
+			GD77sKeypadBankIndex=0;
+		else
+			GD77sKeypadBankIndex++;
+		AnnounceGD77sKeypadChar(true);
+	}
 	else if (BUTTONCHECK_LONGDOWN(ev, BUTTON_SK2))
+	{
+		BackspaceGD77sKeypadChar();
+	}
+	else if (BUTTONCHECK_EXTRALONGDOWN(ev, BUTTON_SK2))
 	{
 		voicePromptsInit();
 		ClearGD77sKeypadBuffer();
-	}
-	else if (BUTTONCHECK_SHORTUP(ev, BUTTON_SK2))
-	{
-		BackspaceGD77sKeypadChar();
 	}
 	else if (BUTTONCHECK_LONGDOWN(ev, BUTTON_ORANGE))
 	{
@@ -4058,7 +4129,7 @@ static bool HandleGD77sKbdEvent(uiEvent_t *ev)
 
 static void SaveGD77SAutoZoneParams()
 {
-	GD77SParameters.channelbankOffset =0; // reset this to avoid a possible channel out of range when switching zones.
+	GD77SParameters.channelbankOffset = 0;
 
 	if (nonVolatileSettings.autoZonesEnabled==0)
 	{
@@ -4502,6 +4573,12 @@ static void handleEventForGD77S(uiEvent_t *ev)
 
 	if (ev->events & BUTTON_EVENT)
 	{
+		if (BUTTONCHECK_LONGDOWN(ev, BUTTON_SK2) && (GD77SParameters.uiMode==GD77S_UIMODE_VOICE))
+		{
+			ReplayDMR();
+			return;
+		}
+
 		if (dtmfSequenceIsKeying() && (ev->buttons & (BUTTON_SK1 | BUTTON_SK2 | BUTTON_ORANGE)))
 		{
 			dtmfSequenceStop();
@@ -4800,6 +4877,17 @@ if (GD77SParameters.cycleFunctionsInReverse && BUTTONCHECK_DOWN(ev, BUTTON_SK1)=
 		{
 			CycleRepeaterOffset(NULL);
 		}
+		else if (BUTTONCHECK_EXTRALONGDOWN(ev, BUTTON_SK2) && (monitorModeData.isEnabled == false) && (uiDataGlobal.DTMFContactList.isKeying == false))
+		{
+			if (!GD77SParameters.virtualVFOMode)
+			{
+				if (currentZone.NOT_IN_CODEPLUGDATA_numChannelsInZone > 16 && rotarySwitchGetPosition()+GD77SParameters.channelbankOffset < (currentZone.NOT_IN_CODEPLUGDATA_numChannelsInZone-16))
+					GD77SParameters.channelbankOffset+=16;
+				else
+					GD77SParameters.channelbankOffset=0;
+				checkAndUpdateSelectedChannelForGD77S(rotarySwitchGetPosition()+GD77SParameters.channelbankOffset, true);
+			}
+		}
 		else if (BUTTONCHECK_LONGDOWN(ev, BUTTON_SK2) && (monitorModeData.isEnabled == false) && (uiDataGlobal.DTMFContactList.isKeying == false))
 		{
 			uint32_t tg = (LinkHead->talkGroupOrPcId & 0xFFFFFF);
@@ -4843,20 +4931,16 @@ if (GD77SParameters.cycleFunctionsInReverse && BUTTONCHECK_DOWN(ev, BUTTON_SK1)=
 			}
 			else
 			{
-				if (!GD77SParameters.virtualVFOMode)
+				if (trxGetMode() == RADIO_MODE_DIGITAL)
 				{
-					if (AutoZoneIsCurrentZone(currentZone.NOT_IN_CODEPLUGDATA_indexNumber))
-					{
-						if (currentZone.NOT_IN_CODEPLUGDATA_numChannelsInZone > 16 && rotarySwitchGetPosition()+GD77SParameters.channelbankOffset < (currentZone.NOT_IN_CODEPLUGDATA_numChannelsInZone-16))
-							GD77SParameters.channelbankOffset+=16;
-						else
-							GD77SParameters.channelbankOffset=0;
-						checkAndUpdateSelectedChannelForGD77S(rotarySwitchGetPosition()+GD77SParameters.channelbankOffset, true);
-					}
-					else
-					{// toggle  autodialer for this zone and channel combination.
-						ToggleGD77SDTMFAutoDialer(true);
-					}
+					ReplayDMR();
+					return;
+				}
+				else
+				{
+					// toggle  autodialer for this zone and channel combination for analog.
+					ToggleGD77SDTMFAutoDialer(true);
+					return;
 				}
 			}
 		}

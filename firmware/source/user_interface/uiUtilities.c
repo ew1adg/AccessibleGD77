@@ -2048,6 +2048,7 @@ ANNOUNCE_STATIC void announcePowerLevel(bool voicePromptWasPlaying)
 	else
 	{
 		voicePromptsAppendLanguageString(&currentLanguage->user_power);
+		voicePromptsAppendInteger(nonVolatileSettings.userPower);
 	}
 }
 
@@ -2278,7 +2279,7 @@ void announceChar(char ch)
 	char buf[2] = {ch, 0};
 
 	voicePromptsInit();
-	voicePromptsAppendStringWithCaps(buf, true);
+	voicePromptsAppendStringWithCaps(buf, true, false, true);
 	voicePromptsPlay();
 }
 
@@ -3692,3 +3693,31 @@ bool ScanShouldSkipFrequency(uint32_t freq)
 	}
 	return false;	
 }
+
+// Handle custom voice prompts.
+bool HandleCustomPrompts(uiEvent_t *ev, char* phrase)
+{
+	if (nonVolatileSettings.audioPromptMode < AUDIO_PROMPT_MODE_VOICE_LEVEL_1) return false;
+
+	if (!KEYCHECK_PRESS_NUMBER(ev->keys) && !KEYCHECK_DOWN_NUMBER(ev->keys) && !KEYCHECK_SHORTUP_NUMBER(ev->keys)) return false;
+	if (((ev->buttons & BUTTON_SK1) && (ev->buttons & BUTTON_SK2)==0)==false) return false;
+	
+	int keyval=menuGetKeypadKeyValueEx(ev, true, false);
+	if (keyval > 9) return false;
+	
+	int customPromptNumber=keyval==0 ? 10: keyval;
+	if (KEYCHECK_LONGDOWN_NUMBER(ev->keys))
+	{
+		SaveCustomVoicePrompt(customPromptNumber, phrase);
+		keyboardReset();
+	}
+	else if (KEYCHECK_SHORTUP_NUMBER(ev->keys))
+	{
+		voicePromptsInit();
+		voicePromptsAppendPrompt(VOICE_PROMPT_CUSTOM+customPromptNumber);
+		voicePromptsPlay();
+		keyboardReset();
+	}
+		
+	return true;
+} 

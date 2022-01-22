@@ -806,6 +806,9 @@ void mainTask(void *data)
 
 				if ((buttons & BUTTON_PTT) != 0)
 				{
+					// If SK1 is held down with PTT, record a voice prompt.
+					HRC6000setEncodingOnly(buttons & BUTTON_SK1);
+					
 					int currentMenu = menuSystemGetCurrentMenuNumber();
 
 					/*
@@ -876,7 +879,8 @@ void mainTask(void *data)
 #endif
 
 									rxPowerSavingSetState(ECOPHASE_POWERSAVE_INACTIVE);
-
+									if (trxGetMode()==RADIO_MODE_DIGITAL)
+										ReplayInit();
 									menuSystemPushNewMenu(UI_TX_SCREEN);
 #if defined(PLATFORM_GD77S)
 								}
@@ -1076,7 +1080,19 @@ void mainTask(void *data)
 				ev.events = NO_EVENT;
 				ev.hasEvent = false;
 			}
+#if !defined(PLATFORM_GD77S)
+			// Handle custom voice prompts.
+			if ((currentMenu == UI_VFO_MODE) || (currentMenu == UI_CHANNEL_MODE))
+			{
+				HandleCustomPrompts(&ev, NULL);
+			}
 
+			if (BUTTONCHECK_DOWN(&ev, BUTTON_SK2) && BUTTONCHECK_SHORTUP(&ev, BUTTON_SK1))
+			{
+				ReplayDMR();
+				keyboardReset();
+			}
+#endif
 			menuSystemCallCurrentMenuTick(&ev);
 
 			// Restore the beep built when a menu was pushed by the quickkey above.
