@@ -513,6 +513,7 @@ static void handleEvent(uiEvent_t *ev)
 							voicePromptsPlay();
 						}
 					}
+
 					updateScreen(false, allowedToSpeakUpdate);
 					return;
 				}
