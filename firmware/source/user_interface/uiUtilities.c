@@ -2332,9 +2332,10 @@ void announceChar(char ch)
 	}
 
 	char buf[2] = {ch, 0};
+	VoicePromptFlags_T flags =settingsIsOptionBitSet(BIT_PHONETIC_SPELL)?vpAnnouncePhoneticRendering:0;
 
 	voicePromptsInit();
-	voicePromptsAppendStringWithCaps(buf, true, false, true);
+	voicePromptsAppendStringEx(buf, vpAnnounceCaps|vpAnnounceSpaceAndSymbols|flags);
 	voicePromptsPlay();
 }
 
@@ -2359,7 +2360,7 @@ void buildCSSCodeVoicePrompts(uint16_t tone, CodeplugCSSTypes_t cssType, Directi
 
 	if (cssType == CSS_TYPE_NONE)
 	{
-		voicePromptsAppendString("CSS");
+		voicePromptsAppendStringEx("CSS", vpAnnounceCustomPrompts);
 		voicePromptsAppendLanguageString(&currentLanguage->none);
 	}
 	else if (cssType == CSS_TYPE_CTCSS)
@@ -2377,7 +2378,7 @@ void buildCSSCodeVoicePrompts(uint16_t tone, CodeplugCSSTypes_t cssType, Directi
 	{
 		if (announceType)
 		{
-			voicePromptsAppendString("DCS");
+			voicePromptsAppendStringEx("DCS", vpAnnounceCustomPrompts);
 		}
 
 		dcsPrintf(buf, BUFFER_LEN, NULL, tone);
@@ -2745,7 +2746,7 @@ voicePromptsAppendInteger(bytes);
 char output[16]="\0";
 
 dmrDbTextDecode((uint8_t*)&output, (uint8_t*)&compressedBuf, bytes);
-voicePromptsAppendStringWithCaps(output,true, false, true);
+voicePromptsAppendStringEx(output,vpAnnounceCustomPrompts);
 }
 */
 void AnnounceChannelSummary(bool voicePromptWasPlaying, bool announceName)
