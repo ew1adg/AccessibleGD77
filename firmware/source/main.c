@@ -76,9 +76,9 @@ static void HandleRXEnding()
 	bool rxEnding=!hasSignal && priorHasSignal && !trxTransmissionEnabled;
 	priorHasSignal = hasSignal;
 	if (!rxEnding) return;
-//nextKeyBeepMelody
+	
 	soundSetMelody(melody_rx_stop_beep);
-	rxEndTimeOut=500;
+	rxEndTimeOut=300;
 }
 
 void mainTaskInit(void)
