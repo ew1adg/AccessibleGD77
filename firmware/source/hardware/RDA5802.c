@@ -52,6 +52,17 @@ void set_freq_rda5802(uint16_t freq)
 	RDA5802WriteReg2byte(0x03, reg);
 }
 
+void set_volume_rda5802(uint8_t volume)
+{
+	uint16_t reg05;
+	RDA5802ReadReg2byte(0x05, &reg05);
+
+	reg05 = reg05 & 0xfff0;
+	reg05 = reg05 | (volume & 0xf);
+
+	RDA5802WriteReg2byte(0x05, reg05);
+}
+
 status_t RDA5802ReadReg2byte(uint8_t reg, uint16_t *val)
 {
     i2c_master_transfer_t masterXfer;
