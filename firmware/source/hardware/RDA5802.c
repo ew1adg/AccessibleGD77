@@ -28,6 +28,18 @@ bool initialize_rda5802()
 	return true;
 }
 
+void enable_rda5802()
+{
+
+	// 0x10: 0x90 0x3  0x00 0x18
+	RDA5802WriteReg2byte(0x02, 0x90, 0x3);
+	RDA5802WriteReg2byte(0x03, 0x00, 0x18);
+
+	// 0x10: 0xD0 0x01 0x2A 0x18
+	RDA5802WriteReg2byte(0x02, 0xD0, 0x01);
+	RDA5802WriteReg2byte(0x03, 0x2A, 0x18);
+}
+
 status_t RDA5802ReadReg2byte(uint8_t reg, uint8_t *val1, uint8_t *val2)
 {
     i2c_master_transfer_t masterXfer;

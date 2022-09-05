@@ -10,6 +10,7 @@
 
 
 bool initialize_rda5802();
+void enable_rda5802();
 status_t RDA5802ReadReg2byte(uint8_t reg, uint8_t *val1, uint8_t *val2);
 status_t RDA5802WriteReg2byte(uint8_t reg, uint8_t val1, uint8_t val2);
 
