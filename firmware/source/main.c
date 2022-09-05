@@ -384,6 +384,7 @@ void mainTask(void *data)
 		die(true);
 	}
 	enable_rda5802();
+	set_freq_rda5802(995);
 	enableAudioAmp(AUDIO_AMP_MODE_RF);
 
 	// ===
