@@ -22,32 +22,27 @@ bool initialize_rda5802()
 		return false;
 	}
 
-	RDA5802WriteReg2byte(0x02, 0xD200);
-	RDA5802WriteReg2byte(0x03, 0x3DD8);
+	RDA5802WriteReg2byte(0x02, 0x0002);
+	RDA5802WriteReg2byte(0x03, 0x0000);
 
 	return true;
 }
 
 void enable_rda5802()
 {
-
-	// 0x10: 0x90 0x3  0x00 0x18
-	RDA5802WriteReg2byte(0x02, 0x903);
-	RDA5802WriteReg2byte(0x03, 0x0018);
-
-	// 0x10: 0xD0 0x01 0x2A 0x18
-	RDA5802WriteReg2byte(0x02, 0xD001);
-	RDA5802WriteReg2byte(0x03, 0x2A18);
+	RDA5802WriteReg2byte(0x02, 0xe005);
+	RDA5802WriteReg2byte(0x03, 0x0000);
 }
 
 void set_freq_rda5802(uint16_t freq)
 {
 	uint16_t channel;
 	uint16_t reg03;
-	RDA5802ReadReg2byte(0x03, &reg03);
 
 	channel = (freq - 870);
-	reg03 &= 0xffc0;
+	RDA5802ReadReg2byte(0x03, &reg03);
+
+	reg03 &= 0x3f;
 	reg03 |= channel << 6;
 	reg03 |= 0x0010;
 
