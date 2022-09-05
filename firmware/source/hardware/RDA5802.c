@@ -4,6 +4,8 @@
  *  Created on: Sep 3, 2022
  *      Author: ew1adg
  */
+#if defined(PLATFORM_RD5R)
+
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -77,3 +79,5 @@ status_t RDA5802ReadReg2byte(uint8_t reg, uint8_t *val1, uint8_t *val2)
     isI2cInUse = 0;
 	return status;
 }
+
+#endif
