@@ -12,8 +12,8 @@
 bool initialize_rda5802();
 void enable_rda5802();
 void set_freq_rda5802(uint16_t freq);
-status_t RDA5802ReadReg2byte(uint8_t reg, uint8_t *val1, uint8_t *val2);
-status_t RDA5802WriteReg2byte(uint8_t reg, uint8_t val1, uint8_t val2);
+status_t RDA5802ReadReg2byte(uint8_t reg, uint16_t *val);
+status_t RDA5802WriteReg2byte(uint8_t reg, uint16_t val);
 
 #endif
 #endif

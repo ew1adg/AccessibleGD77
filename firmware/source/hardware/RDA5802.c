@@ -14,16 +14,16 @@
 
 bool initialize_rda5802()
 {
-	uint8_t hi_byte, lo_byte;
+	uint16_t value;
 
 	// Verify chip ID
-	RDA5802ReadReg2byte(RDA5802_CHIP_ID_REG, &hi_byte, &lo_byte);
-	if (hi_byte != 0x58 || lo_byte != 0x04) {
+	RDA5802ReadReg2byte(RDA5802_CHIP_ID_REG, &value);
+	if (value != 0x5804) {
 		return false;
 	}
 
-	RDA5802WriteReg2byte(0x02, 0xD2, 0x00);
-	RDA5802WriteReg2byte(0x03, 0x3D, 0xD8);
+	RDA5802WriteReg2byte(0x02, 0xD200);
+	RDA5802WriteReg2byte(0x03, 0x3DD8);
 
 	return true;
 }
@@ -32,12 +32,12 @@ void enable_rda5802()
 {
 
 	// 0x10: 0x90 0x3  0x00 0x18
-	RDA5802WriteReg2byte(0x02, 0x90, 0x3);
-	RDA5802WriteReg2byte(0x03, 0x00, 0x18);
+	RDA5802WriteReg2byte(0x02, 0x903);
+	RDA5802WriteReg2byte(0x03, 0x0018);
 
 	// 0x10: 0xD0 0x01 0x2A 0x18
-	RDA5802WriteReg2byte(0x02, 0xD0, 0x01);
-	RDA5802WriteReg2byte(0x03, 0x2A, 0x18);
+	RDA5802WriteReg2byte(0x02, 0xD001);
+	RDA5802WriteReg2byte(0x03, 0x2A18);
 }
 
 void set_freq_rda5802(uint16_t freq)
@@ -49,10 +49,10 @@ void set_freq_rda5802(uint16_t freq)
 	reg = 0x0010;
 	reg |= channel << 6;
 
-	RDA5802WriteReg2byte(0x03, reg >> 8, reg & 0xff);
+	RDA5802WriteReg2byte(0x03, reg);
 }
 
-status_t RDA5802ReadReg2byte(uint8_t reg, uint8_t *val1, uint8_t *val2)
+status_t RDA5802ReadReg2byte(uint8_t reg, uint16_t *val)
 {
     i2c_master_transfer_t masterXfer;
     status_t status;
@@ -100,14 +100,14 @@ status_t RDA5802ReadReg2byte(uint8_t reg, uint8_t *val1, uint8_t *val2)
     	return status;
     }
 
-    *val1 = buff[0];
-    *val2 = buff[1];
+    *val = buff[0] << 8;
+    *val |= buff[1];
 
     isI2cInUse = 0;
 	return status;
 }
 
-status_t RDA5802WriteReg2byte(uint8_t reg, uint8_t val1, uint8_t val2)
+status_t RDA5802WriteReg2byte(uint8_t reg, uint16_t val)
 {
     i2c_master_transfer_t masterXfer;
     status_t status;
@@ -123,8 +123,8 @@ status_t RDA5802WriteReg2byte(uint8_t reg, uint8_t val1, uint8_t val2)
     isI2cInUse = 3;
 
 	buff[0] = reg;
-	buff[1] = val1;
-	buff[2] = val2;
+	buff[1] = val >> 8;
+	buff[2] = val & 0xff;
 
     memset(&masterXfer, 0, sizeof(masterXfer));
     masterXfer.slaveAddress = RDA5802_ADDRESS;
