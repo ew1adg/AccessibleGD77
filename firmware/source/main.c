@@ -383,6 +383,12 @@ void mainTask(void *data)
 		USB_DeviceApplicationInit();
 		die(true);
 	}
+	enable_rda5802();
+	enableAudioAmp(AUDIO_AMP_MODE_RF);
+
+	// ===
+	watchdogDeinit();
+	while(true);
 #endif
 
 	// Check if DMR codec is available
