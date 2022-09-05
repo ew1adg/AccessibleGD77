@@ -39,6 +39,7 @@
 #include "functions/rxPowerSaving.h"
 #include "interfaces/wdog.h"
 #include "user_interface/editHandler.h"
+#include "hardware/RDA5802.h"
 
 #if defined(USING_EXTERNAL_DEBUGGER)
 #include "SeggerRTT/RTT/SEGGER_RTT.h"
@@ -370,6 +371,14 @@ void mainTask(void *data)
 	if ((SPI_Flash_init() == false) || (calibrationInit() == false) || (calibrationCheckAndCopyToCommonLocation(false) == false))
 	{
 		showErrorMessage("CAL DATA ERROR");
+		USB_DeviceApplicationInit();
+		die(true);
+	}
+
+	// FM-radio
+	if (initialize_rda5802() == false)
+	{
+		showErrorMessage("FM INIT ERROR");
 		USB_DeviceApplicationInit();
 		die(true);
 	}
