@@ -43,13 +43,15 @@ void enable_rda5802()
 void set_freq_rda5802(uint16_t freq)
 {
 	uint16_t channel;
-	uint16_t reg;
+	uint16_t reg03;
+	RDA5802ReadReg2byte(0x03, &reg03);
 
 	channel = (freq - 870);
-	reg = 0x0010;
-	reg |= channel << 6;
+	reg03 &= 0xffc0;
+	reg03 |= channel << 6;
+	reg03 |= 0x0010;
 
-	RDA5802WriteReg2byte(0x03, reg);
+	RDA5802WriteReg2byte(0x03, reg03);
 }
 
 void set_volume_rda5802(uint8_t volume)
