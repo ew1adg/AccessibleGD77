@@ -22,16 +22,15 @@ bool initialize_rda5802()
 		return false;
 	}
 
-	RDA5802WriteReg2byte(0x02, 0x0002);
-	RDA5802WriteReg2byte(0x03, 0x0000);
-
 	return true;
 }
 
 void enable_rda5802()
 {
-	RDA5802WriteReg2byte(0x02, 0xe005);
-	RDA5802WriteReg2byte(0x03, 0x0000);
+	RDA5802WriteBatch(0xD001, 0x759a);
+
+	//RDA5802WriteReg2byte(0x02, 0xe005);
+	//RDA5802WriteReg2byte(0x03, 0x0000);
 }
 
 void set_freq_rda5802(uint16_t freq)
@@ -141,6 +140,41 @@ status_t RDA5802WriteReg2byte(uint8_t reg, uint16_t val)
     masterXfer.subaddressSize = 0;
     masterXfer.data = buff;
     masterXfer.dataSize = 3;
+    masterXfer.flags = kI2C_TransferDefaultFlag;
+
+    status = I2C_MasterTransferBlocking(I2C0, &masterXfer);
+
+    isI2cInUse = 0;
+	return status;
+}
+
+status_t RDA5802WriteBatch(uint16_t val, uint16_t val2)
+{
+    i2c_master_transfer_t masterXfer;
+    status_t status;
+    uint8_t buff[4];// Transfers are always 3 bytes but pad to 4 byte boundary
+
+    if (isI2cInUse)
+    {
+#if defined(USING_EXTERNAL_DEBUGGER) && defined(DEBUG_I2C)
+        SEGGER_RTT_printf(0, "Clash in write_I2C_reg_2byte (3) with %d\n",isI2cInUse);
+#endif
+        return kStatus_Success;
+    }
+    isI2cInUse = 3;
+
+	buff[0] = val >> 8;
+	buff[1] = val & 0xff;
+	buff[2] = val2 >> 8;
+	buff[3] = val2 & 0xff;
+
+    memset(&masterXfer, 0, sizeof(masterXfer));
+    masterXfer.slaveAddress = 0x10;
+    masterXfer.direction = kI2C_Write;
+    masterXfer.subaddress = 0;
+    masterXfer.subaddressSize = 0;
+    masterXfer.data = buff;
+    masterXfer.dataSize = 4;
     masterXfer.flags = kI2C_TransferDefaultFlag;
 
     status = I2C_MasterTransferBlocking(I2C0, &masterXfer);
