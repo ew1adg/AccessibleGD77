@@ -28,11 +28,12 @@ bool initialize_rda5802()
 
 void enable_rda5802()
 {
-	RDA5802WriteBatch(0xD001, 0x759a);
+	RDA5802BatchWrite(0xD001, 0x759a);
 	GPIO_PinWrite(GPIO_FM_preamp, Pin_FM_preamp, 1);
 
 	//RDA5802WriteReg2byte(0x02, 0xe005);
 	//RDA5802WriteReg2byte(0x03, 0x0000);
+
 }
 
 void set_freq_rda5802(uint16_t freq)
@@ -150,7 +151,7 @@ status_t RDA5802WriteReg2byte(uint8_t reg, uint16_t val)
 	return status;
 }
 
-status_t RDA5802WriteBatch(uint16_t val, uint16_t val2)
+status_t RDA5802BatchWrite(uint16_t val, uint16_t val2)
 {
     i2c_master_transfer_t masterXfer;
     status_t status;
