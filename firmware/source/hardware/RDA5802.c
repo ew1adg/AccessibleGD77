@@ -151,7 +151,7 @@ status_t RDA5802WriteReg2byte(uint8_t reg, uint16_t val)
 	return status;
 }
 
-status_t RDA5802BatchWrite(uint16_t val, uint16_t val2)
+status_t RDA5802BatchWrite(uint16_t reg02, uint16_t reg03)
 {
     i2c_master_transfer_t masterXfer;
     status_t status;
@@ -166,10 +166,10 @@ status_t RDA5802BatchWrite(uint16_t val, uint16_t val2)
     }
     isI2cInUse = 3;
 
-	buff[0] = val >> 8;
-	buff[1] = val & 0xff;
-	buff[2] = val2 >> 8;
-	buff[3] = val2 & 0xff;
+	buff[0] = reg02 >> 8;
+	buff[1] = reg02 & 0xff;
+	buff[2] = reg03 >> 8;
+	buff[3] = reg03 & 0xff;
 
     memset(&masterXfer, 0, sizeof(masterXfer));
     masterXfer.slaveAddress = 0x10;
