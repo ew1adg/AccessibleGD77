@@ -22,6 +22,7 @@ bool initialize_rda5802()
 	if (value != 0x5804) {
 		return false;
 	}
+	disable_rda5802();
 
 	return true;
 }
@@ -34,6 +35,12 @@ void enable_rda5802()
 	//RDA5802WriteReg2byte(0x02, 0xe005);
 	//RDA5802WriteReg2byte(0x03, 0x0000);
 
+}
+
+void disable_rda5802()
+{
+	RDA5802BatchWrite(0x0002, 0x0000);
+	GPIO_PinWrite(GPIO_FM_preamp, Pin_FM_preamp, 0);
 }
 
 void set_freq_rda5802(uint16_t freq)
