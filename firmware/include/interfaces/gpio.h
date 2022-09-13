@@ -173,10 +173,14 @@ extern gpio_pin_config_t pin_config_output;
 
 #elif defined(PLATFORM_RD5R)
 
-/* --------------  RD-5R specific Torch LED  ---------------- */
+/* --------------  RD-5R specific  ---------------- */
 #define Port_Torch  PORTD
 #define GPIO_Torch  GPIOD
 #define Pin_Torch	4
+
+#define Port_FM_preamp	PORTC
+#define GPIO_FM_preamp	GPIOC
+#define Pin_FM_preamp	6
 
 /* --------------  Audio amp and audio path  ---------------- */
 #define Port_audio_amp_enable PORTC
