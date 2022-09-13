@@ -109,6 +109,13 @@ void gpioInitCommon(void)
 
     GPIO_PinWrite(GPIO_UHF_TX_amp_power, Pin_UHF_TX_amp_power, 0);
     GPIO_PinWrite(GPIO_VHF_TX_amp_power, Pin_VHF_TX_amp_power, 0);
+
+#if defined(PLATFORM_RD5R)
+    // FM radio Rx preamp
+    PORT_SetPinMux(Port_FM_preamp, Pin_FM_preamp, kPORT_MuxAsGpio);
+    GPIO_PinInit(GPIO_FM_preamp, Pin_FM_preamp, &pin_config_output);
+    GPIO_PinWrite(GPIO_FM_preamp, Pin_FM_preamp, 0);
+#endif
 }
 
 void gpioInitDisplay()
