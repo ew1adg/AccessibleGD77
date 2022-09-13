@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "interfaces/gpio.h"
 #include "hardware/RDA5802.h"
 
 
@@ -28,6 +29,7 @@ bool initialize_rda5802()
 void enable_rda5802()
 {
 	RDA5802WriteBatch(0xD001, 0x759a);
+	GPIO_PinWrite(GPIO_FM_preamp, Pin_FM_preamp, 1);
 
 	//RDA5802WriteReg2byte(0x02, 0xe005);
 	//RDA5802WriteReg2byte(0x03, 0x0000);
