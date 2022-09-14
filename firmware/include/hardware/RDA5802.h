@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "interfaces/i2c.h"
 
+#define RDA5802_BATCH_ADDRESS 0x10
 #define RDA5802_ADDRESS	0x11
 #define RDA5802_CHIP_ID_REG 0x00
 

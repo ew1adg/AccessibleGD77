@@ -179,7 +179,7 @@ status_t RDA5802BatchWrite(uint16_t reg02, uint16_t reg03)
 	buff[3] = reg03 & 0xff;
 
     memset(&masterXfer, 0, sizeof(masterXfer));
-    masterXfer.slaveAddress = 0x10;
+    masterXfer.slaveAddress = RDA5802_BATCH_ADDRESS;
     masterXfer.direction = kI2C_Write;
     masterXfer.subaddress = 0;
     masterXfer.subaddressSize = 0;
