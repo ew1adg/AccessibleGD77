@@ -386,7 +386,6 @@ void mainTask(void *data)
 	enable_rda5802();
 	set_freq_rda5802(995);
 	set_volume_rda5802(4);
-	enableAudioAmp(AUDIO_AMP_MODE_RF);
 
 	// ===
 	watchdogDeinit();

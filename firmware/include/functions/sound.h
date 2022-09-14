@@ -106,6 +106,7 @@ void soundTickMelody(void);
 #define AUDIO_AMP_MODE_BEEP 	(1 << 0)
 #define AUDIO_AMP_MODE_RF 		(1 << 1)
 #define AUDIO_AMP_MODE_PROMPT 	(1 << 2)
+#define AUDIO_AMP_MODE_FM		(1 << 3)
 
 
 uint8_t getAudioAmpStatus(void);

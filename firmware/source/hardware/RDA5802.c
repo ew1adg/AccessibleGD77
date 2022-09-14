@@ -10,6 +10,7 @@
 #include <stdbool.h>
 
 #include "interfaces/gpio.h"
+#include "functions/sound.h"
 #include "hardware/RDA5802.h"
 
 
@@ -31,6 +32,7 @@ void enable_rda5802()
 {
 	RDA5802BatchWrite(0xD001, 0x759a);
 	GPIO_PinWrite(GPIO_FM_preamp, Pin_FM_preamp, 1);
+	enableAudioAmp(AUDIO_AMP_MODE_FM);
 
 	//RDA5802WriteReg2byte(0x02, 0xe005);
 	//RDA5802WriteReg2byte(0x03, 0x0000);
@@ -41,6 +43,7 @@ void disable_rda5802()
 {
 	RDA5802BatchWrite(0x0002, 0x0000);
 	GPIO_PinWrite(GPIO_FM_preamp, Pin_FM_preamp, 0);
+	disableAudioAmp(AUDIO_AMP_MODE_FM);
 }
 
 void set_freq_rda5802(uint16_t freq)
