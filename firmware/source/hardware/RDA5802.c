@@ -13,6 +13,9 @@
 #include "functions/sound.h"
 #include "hardware/RDA5802.h"
 
+// Storage for register values
+static uint8_t rda5802_regs[8] = {0};
+
 
 bool initialize_rda5802()
 {
@@ -20,7 +23,7 @@ bool initialize_rda5802()
 
 	// Verify chip ID
 	RDA5802ReadReg2byte(RDA5802_CHIP_ID_REG, &value);
-	if (value != 0x5804) {
+	if (value >> 8 != 0x58) {
 		return false;
 	}
 	disable_rda5802();
@@ -30,46 +33,58 @@ bool initialize_rda5802()
 
 void enable_rda5802()
 {
-	RDA5802BatchWrite(0xD001, 0x759a);
 	GPIO_PinWrite(GPIO_FM_preamp, Pin_FM_preamp, 1);
 	enableAudioAmp(AUDIO_AMP_MODE_FM);
 
-	//RDA5802WriteReg2byte(0x02, 0xe005);
-	//RDA5802WriteReg2byte(0x03, 0x0000);
+	// Set default values
+	rda5802_regs[0] = RDA5802_DHIZ | RDA5802_DMUTE | RDA5802_MONO;
+	rda5802_regs[1] = RDA5802_CLK_MODE_32768 | RDA5802_NEW_METHOD | RDA5802_ENABLE;
+	rda5802_regs[2] = 0;
+	rda5802_regs[3] = RDA5802_BAND_US_EUROPE | RDA5802_STEP_50;
+	rda5802_regs[4] = 0;
+	rda5802_regs[5] = 0;
+	rda5802_regs[6] = 0b1000 & RDA5802_SEEKTH;
+	rda5802_regs[7] = RDA5802_LNA_PORT_SEL_LNAP | RDA5802_VOLUME;
 
+	RDA5802BatchWrite(rda5802_regs);
 }
 
 void disable_rda5802()
 {
-	RDA5802BatchWrite(0x0002, 0x0000);
 	GPIO_PinWrite(GPIO_FM_preamp, Pin_FM_preamp, 0);
 	disableAudioAmp(AUDIO_AMP_MODE_FM);
+
+	// Set default values
+	rda5802_regs[0] = 0;
+	rda5802_regs[1] = 0;
+	rda5802_regs[2] = 0;
+	rda5802_regs[3] = 0;
+	rda5802_regs[4] = 0;
+	rda5802_regs[5] = 0;
+	rda5802_regs[6] = 0;
+	rda5802_regs[7] = 0;
+
+	RDA5802BatchWrite(rda5802_regs);
 }
 
 void set_freq_rda5802(uint16_t freq)
 {
-	uint16_t channel;
-	uint16_t reg03;
+	uint16_t chan;
 
-	channel = (freq - 870);
-	RDA5802ReadReg2byte(0x03, &reg03);
+    chan = (freq - 8700) / 5; // 50 Khz
 
-	reg03 &= 0x3f;
-	reg03 |= channel << 6;
-	reg03 |= 0x0010;
+    rda5802_regs[2] = chan >> 2;
+    rda5802_regs[3] = ((chan & 0x03) << 6) | RDA5802_TUNE | RDA5802_BAND_US_EUROPE | RDA5802_STEP_50;
 
-	RDA5802WriteReg2byte(0x03, reg03);
+    RDA5802BatchWrite(rda5802_regs);
 }
 
-void set_volume_rda5802(uint8_t volume)
+uint16_t get_freq_rda5802()
 {
-	uint16_t reg05;
-	RDA5802ReadReg2byte(0x05, &reg05);
+	uint16_t val;
 
-	reg05 = reg05 & 0xfff0;
-	reg05 = reg05 | (volume & 0xf);
-
-	RDA5802WriteReg2byte(0x05, reg05);
+	RDA5802ReadReg2byte(0x0A, &val);
+	return val;
 }
 
 status_t RDA5802ReadReg2byte(uint8_t reg, uint16_t *val)
@@ -127,11 +142,10 @@ status_t RDA5802ReadReg2byte(uint8_t reg, uint16_t *val)
 	return status;
 }
 
-status_t RDA5802WriteReg2byte(uint8_t reg, uint16_t val)
+status_t RDA5802BatchWrite(uint8_t *registers)
 {
     i2c_master_transfer_t masterXfer;
     status_t status;
-    uint8_t buff[4];// Transfers are always 3 bytes but pad to 4 byte boundary
 
     if (isI2cInUse)
     {
@@ -141,53 +155,14 @@ status_t RDA5802WriteReg2byte(uint8_t reg, uint16_t val)
         return kStatus_Success;
     }
     isI2cInUse = 3;
-
-	buff[0] = reg;
-	buff[1] = val >> 8;
-	buff[2] = val & 0xff;
-
-    memset(&masterXfer, 0, sizeof(masterXfer));
-    masterXfer.slaveAddress = RDA5802_ADDRESS;
-    masterXfer.direction = kI2C_Write;
-    masterXfer.subaddress = 0;
-    masterXfer.subaddressSize = 0;
-    masterXfer.data = buff;
-    masterXfer.dataSize = 3;
-    masterXfer.flags = kI2C_TransferDefaultFlag;
-
-    status = I2C_MasterTransferBlocking(I2C0, &masterXfer);
-
-    isI2cInUse = 0;
-	return status;
-}
-
-status_t RDA5802BatchWrite(uint16_t reg02, uint16_t reg03)
-{
-    i2c_master_transfer_t masterXfer;
-    status_t status;
-    uint8_t buff[4];// Transfers are always 3 bytes but pad to 4 byte boundary
-
-    if (isI2cInUse)
-    {
-#if defined(USING_EXTERNAL_DEBUGGER) && defined(DEBUG_I2C)
-        SEGGER_RTT_printf(0, "Clash in write_I2C_reg_2byte (3) with %d\n",isI2cInUse);
-#endif
-        return kStatus_Success;
-    }
-    isI2cInUse = 3;
-
-	buff[0] = reg02 >> 8;
-	buff[1] = reg02 & 0xff;
-	buff[2] = reg03 >> 8;
-	buff[3] = reg03 & 0xff;
 
     memset(&masterXfer, 0, sizeof(masterXfer));
     masterXfer.slaveAddress = RDA5802_BATCH_ADDRESS;
     masterXfer.direction = kI2C_Write;
     masterXfer.subaddress = 0;
     masterXfer.subaddressSize = 0;
-    masterXfer.data = buff;
-    masterXfer.dataSize = 4;
+    masterXfer.data = registers;
+    masterXfer.dataSize = 8;
     masterXfer.flags = kI2C_TransferDefaultFlag;
 
     status = I2C_MasterTransferBlocking(I2C0, &masterXfer);
