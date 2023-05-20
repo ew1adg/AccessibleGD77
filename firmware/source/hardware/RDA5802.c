@@ -42,7 +42,7 @@ void enable_rda5802()
 	rda5802_regs[3] = RDA5802_BAND_US_EUROPE | RDA5802_STEP_50;
 	rda5802_regs[4] = 0;
 	rda5802_regs[5] = 0;
-	rda5802_regs[6] = 0b1000 & RDA5802_SEEKTH;
+	rda5802_regs[6] = 0b1000 & 0b0001000; // RDA5802_SEEKTH;
 	rda5802_regs[7] = RDA5802_LNA_PORT_SEL_LNAP | RDA5802_VOLUME;
 
 	RDA5802BatchWrite(rda5802_regs);
@@ -64,6 +64,17 @@ void disable_rda5802()
 	rda5802_regs[7] = 0;
 
 	RDA5802BatchWrite(rda5802_regs);
+}
+
+void start_seek(bool seekup)
+{
+    rda5802_regs[0] |= RDA580X_SEEK;
+    if (seekup) {
+    	rda5802_regs[0] |= RDA5802_SEEKUP;
+    } else {
+    	rda5802_regs[0] &= ~RDA5802_SEEKUP;
+    }
+    RDA5802BatchWrite(rda5802_regs);
 }
 
 void set_freq_rda5802(uint16_t freq)
