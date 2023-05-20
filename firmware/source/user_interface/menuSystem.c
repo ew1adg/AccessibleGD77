@@ -97,6 +97,7 @@ menuDataGlobal_t menuDataGlobal =
 				NULL,// New DTMF Contact
 				NULL,// Last Heard SubMenu
 				NULL, // AutoZone
+				NULL, // FM radio
 				NULL, // MENU_RADIO_DETAILS
 		}
 };
@@ -141,6 +142,7 @@ static menuFunctionData_t menuFunctions[] =
 		{ menuLastHeardSubMenu,     0 },
 		{ menuAutoZone,             0 },
 		{ menuRadioDetails, 		0 },
+		{ menuFMradio,              0 },
 };
 
 static void menuSystemCheckForFirstEntryAudible(menuStatus_t status)
@@ -397,14 +399,15 @@ const menuItemNewData_t mainMenuItems[] =
 	{   8, MENU_FIRMWARE_INFO   },
 	{   2, MENU_CREDITS         },
 	{   175, MENU_AUTOZONE        },
+	{   194, MENU_FMRADIO         },
 };
 
 const menuItemsList_t menuDataMainMenu =
 {
 #ifdef ACCESSIBLEGD77_MULTILINGUAL_SUPPORT
-	.numItems = 14,
+	.numItems = 15,
 #else
-	.numItems = 13,
+	.numItems = 14,
 #endif
 	.items = mainMenuItems
 };

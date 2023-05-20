@@ -245,6 +245,7 @@ enum MENU_SCREENS
 	MENU_LAST_HEARD_SUBMENU,
 	MENU_AUTOZONE,
 	MENU_RADIO_DETAILS,
+	MENU_FMRADIO,
 	NUM_MENU_ENTRIES
 };
 
@@ -326,5 +327,6 @@ menuStatus_t menuPrivateCall(uiEvent_t *event, bool isFirstRun);
 menuStatus_t uiMessageBox(uiEvent_t *event, bool isFirstRun);
 menuStatus_t menuAutoZone(uiEvent_t *ev, bool isFirstRun);
 menuStatus_t menuRadioDetails(uiEvent_t *ev, bool isFirstRun);
+menuStatus_t menuFMradio(uiEvent_t *ev, bool isFirstRun);
 
 #endif
