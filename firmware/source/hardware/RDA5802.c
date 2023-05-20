@@ -15,15 +15,14 @@
 
 // Storage for register values
 static uint8_t rda5802_regs[8] = {0};
+uint16_t rda5802_reg_val;
 
 
 bool initialize_rda5802()
 {
-	uint16_t value;
-
 	// Verify chip ID
-	RDA5802ReadReg2byte(RDA5802_CHIP_ID_REG, &value);
-	if (value >> 8 != 0x58) {
+	RDA5802ReadReg2byte(RDA5802_CHIP_ID_REG, &rda5802_reg_val);
+	if (rda5802_reg_val >> 8 != 0x58) {
 		return false;
 	}
 	disable_rda5802();
@@ -82,37 +81,29 @@ void set_freq_rda5802(uint16_t freq)
 /* Get actual frequency value. Multiply by 10 to get value in KHz */
 uint16_t get_freq_rda5802()
 {
-	uint16_t val;
-
-	RDA5802ReadReg2byte(0x0A, &val);
-	return 8700 + (val & 0x3ff) * 5; // 50 KHz step
+	RDA5802ReadReg2byte(0x0A, &rda5802_reg_val);
+	return 8700 + (rda5802_reg_val & 0x3ff) * 5; // 50 KHz step
 }
 
 /* Read RSSI value */
 uint16_t get_rssi_rda5802()
 {
-	uint16_t val;
-
-	RDA5802ReadReg2byte(0x0B, &val);
-	return val >> 10;
+	RDA5802ReadReg2byte(0x0B, &rda5802_reg_val);
+	return rda5802_reg_val >> 10;
 }
 
 /* The seek/tune complete flag is set when the seek or tune operation completes. */
 bool get_stc_flag()
 {
-	uint16_t val;
-
-	RDA5802ReadReg2byte(0x0A, &val);
-	return (val >> 14) % 2;
+	RDA5802ReadReg2byte(0x0A, &rda5802_reg_val);
+	return (rda5802_reg_val >> 14) % 2;
 }
 
 /* The seek fail flag is set when the seek operation fails */
 bool get_sf_flag()
 {
-	uint16_t val;
-
-	RDA5802ReadReg2byte(0x0A, &val);
-	return (val >> 13) % 2;
+	RDA5802ReadReg2byte(0x0A, &rda5802_reg_val);
+	return (rda5802_reg_val >> 13) % 2;
 }
 
 status_t RDA5802ReadReg2byte(uint8_t reg, uint16_t *val)
