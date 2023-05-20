@@ -78,4 +78,13 @@ static void handleEvent(uiEvent_t *ev)
 		saveQuickkeyMenuIndex(ev->keys.key, menuSystemGetCurrentMenuNumber(), 0, 0);
 		return;
 	}
+	else if (KEYCHECK_LONGDOWN(ev->keys, KEY_UP))
+	{
+		start_seek(true);
+	}
+	else if (KEYCHECK_LONGDOWN(ev->keys, KEY_DOWN))
+	{
+		start_seek(false);
+	}
+
 }
