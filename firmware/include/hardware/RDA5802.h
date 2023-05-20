@@ -73,8 +73,13 @@ bool initialize_rda5802();
 void enable_rda5802();
 void disable_rda5802();
 void set_freq_rda5802(uint16_t freq);
+uint16_t get_freq_rda5802();
+uint16_t get_rssi_rda5802();
+bool get_stc_flag();
+bool get_sf_flag();
 status_t RDA5802ReadReg2byte(uint8_t reg, uint16_t *val);
 status_t RDA5802BatchWrite(uint8_t *registers);
+status_t RDA5802BatchRead(uint8_t *registers);
 
 #endif
 #endif
