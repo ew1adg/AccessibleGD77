@@ -375,23 +375,6 @@ void mainTask(void *data)
 		die(true);
 	}
 
-#if defined(PLATFORM_RD5R)
-	// FM-radio
-	if (initialize_rda5802() == false)
-	{
-		showErrorMessage("FM INIT ERROR");
-		USB_DeviceApplicationInit();
-		die(true);
-	}
-	enable_rda5802();
-	set_freq_rda5802(995);
-	set_volume_rda5802(4);
-
-	// ===
-	watchdogDeinit();
-	while(true);
-#endif
-
 	// Check if DMR codec is available
 	uiDataGlobal.dmrDisabled = !codecIsAvailable();
 
