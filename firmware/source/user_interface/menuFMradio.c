@@ -3,6 +3,7 @@
 #include "user_interface/menuSystem.h"
 #include "user_interface/uiUtilities.h"
 #include "user_interface/uiLocalisation.h"
+#include "hardware/RDA5802.h"
 
 static menuStatus_t menuRSSIExitCode = MENU_STATUS_SUCCESS;
 static void updateScreen(bool forceRedraw, bool firstRun);
@@ -20,6 +21,11 @@ menuStatus_t menuFMradio(uiEvent_t *ev, bool isFirstRun)
 		menuDisplayTitle(currentLanguage->fmradio);
 		ucRenderRows(0, 2);
 
+		if (initialize_rda5802())
+		{
+			enable_rda5802();
+			set_freq_rda5802(9790);
+		}
 		updateScreen(true, true);
 	}
 	else
@@ -45,11 +51,10 @@ static void updateScreen(bool forceRedraw, bool isFirstRun)
 	// Clear whole drawing region
 	ucFillRect(0, 14, DISPLAY_SIZE_X, DISPLAY_SIZE_Y - 14, true);
 
-	uint8_t upper_freq = 99;
-	uint8_t lower_freq = 10;
+	uint16_t freq = get_freq_rda5802();
 
 	char buffer[16] = {0};
-	snprintf(buffer, SCREEN_LINE_BUFFER_SIZE, "%3d.%02d%s", upper_freq, lower_freq, "MHz");
+	snprintf(buffer, SCREEN_LINE_BUFFER_SIZE, "%3d.%02d%s", freq / 100, freq % 100, "MHz");
 	ucPrintCentered(DISPLAY_Y_POS_RSSI_VALUE, buffer, FONT_SIZE_3);
 
 	ucRender();
@@ -57,8 +62,14 @@ static void updateScreen(bool forceRedraw, bool isFirstRun)
 
 static void handleEvent(uiEvent_t *ev)
 {
-	if (KEYCHECK_SHORTUP(ev->keys, KEY_GREEN) || KEYCHECK_SHORTUP(ev->keys, KEY_RED))
+	if (KEYCHECK_SHORTUP(ev->keys, KEY_GREEN))
 	{
+		menuSystemPopPreviousMenu();
+		return;
+	}
+	else if (KEYCHECK_SHORTUP(ev->keys, KEY_RED))
+	{
+		disable_rda5802();
 		menuSystemPopPreviousMenu();
 		return;
 	}
