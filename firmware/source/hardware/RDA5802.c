@@ -39,7 +39,7 @@ void enable_rda5802()
 	rda5802_regs[0] = RDA5802_DHIZ | RDA5802_DMUTE | RDA5802_MONO;
 	rda5802_regs[1] = RDA5802_CLK_MODE_32768 | RDA5802_NEW_METHOD | RDA5802_ENABLE;
 	rda5802_regs[2] = 0;
-	rda5802_regs[3] = RDA5802_BAND_US_EUROPE | RDA5802_STEP_50;
+	rda5802_regs[3] = RDA5802_BAND_US_EUROPE | RDA5802_STEP_100;
 	rda5802_regs[4] = 0;
 	rda5802_regs[5] = 0;
 	rda5802_regs[6] = 0b1000 & 0b0001000; // RDA5802_SEEKTH;
@@ -81,10 +81,10 @@ void set_freq_rda5802(uint16_t freq)
 {
 	uint16_t chan;
 
-    chan = (freq - 8700) / 5; // 50 Khz
+    chan = (freq - 8700) / 10; // 100 Khz
 
     rda5802_regs[2] = chan >> 2;
-    rda5802_regs[3] = ((chan & 0x03) << 6) | RDA5802_TUNE | RDA5802_BAND_US_EUROPE | RDA5802_STEP_50;
+    rda5802_regs[3] = ((chan & 0x03) << 6) | RDA5802_TUNE | RDA5802_BAND_US_EUROPE | RDA5802_STEP_100;
 
     RDA5802BatchWrite(rda5802_regs);
 }
@@ -93,7 +93,7 @@ void set_freq_rda5802(uint16_t freq)
 uint16_t get_freq_rda5802()
 {
 	RDA5802ReadReg2byte(0x0A, &rda5802_reg_val);
-	return 8700 + (rda5802_reg_val & 0x3ff) * 5; // 50 KHz step
+	return 8700 + (rda5802_reg_val & 0x3ff) * 10; // 100 KHz step
 }
 
 /* Read RSSI value */
