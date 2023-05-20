@@ -236,7 +236,8 @@ const stringsTable_t englishLanguage =
 .sortBy= "Sort by", // name/frq
 .frequency = "Frq",
 .dtmf_rate="DTMF Rate",
-.promptReview = "Prompt Review"
+.promptReview = "Prompt Review",
+.fmradio="FM radio"
 };
 /********************************************************************
  *

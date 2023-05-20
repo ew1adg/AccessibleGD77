@@ -210,7 +210,8 @@ const stringsTable_t polishLanguage =
 .scan_on_boot				= "Skan->Start",
 .dtmf_entry				= "DTMF wpis",
 .name					= "Name",
-.openDM1801A 				= "OpenDM1801A" // Do not translate
+.openDM1801A 				= "OpenDM1801A", // Do not translate
+.fmradio                                = "FM radio"
 };
 /********************************************************************
  *

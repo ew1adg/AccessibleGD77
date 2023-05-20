@@ -210,7 +210,8 @@ const stringsTable_t italianLanguage =
 .scan_on_boot				= "Scan su ON",
 .dtmf_entry				= "DTMF entry",
 .name					= "Name",
-.openDM1801A 				= "OpenDM1801A" // Do not translate
+.openDM1801A 				= "OpenDM1801A", // Do not translate
+.fmradio                                = "FM radio"
 };
 /********************************************************************
  *

@@ -210,7 +210,8 @@ const stringsTable_t germanLanguage =
 .scan_on_boot				= "Scan @ Start", //Maxlen: 12 chars
 .dtmf_entry				= "DTMF entry",
 .name					= "Name",
-.openDM1801A 				= "OpenDM1801A" // Do not translate
+.openDM1801A 				= "OpenDM1801A", // Do not translate
+.fmradio                                = "FM radio"
 };
 /********************************************************************
  *

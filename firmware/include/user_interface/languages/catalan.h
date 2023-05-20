@@ -210,7 +210,8 @@ const stringsTable_t catalanLanguage=
 .scan_on_boot				= "Scan inici",
 .dtmf_entry				= "Entrada DTMF",
 .name					= "Nom",
-.openDM1801A 				= "OpenDM1801A" // Do not translate
+.openDM1801A 				= "OpenDM1801A", // Do not translate
+.fmradio                                = "FM radio"
 };
 /********************************************************************
  *

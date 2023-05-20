@@ -249,6 +249,7 @@ typedef struct
    const char* frequency;
    const char* dtmf_rate;
    const char* promptReview;
+   const char* fmradio;
 } stringsTable_t;
 
 extern const stringsTable_t languages[];
