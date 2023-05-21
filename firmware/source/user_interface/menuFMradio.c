@@ -5,7 +5,7 @@
 #include "user_interface/uiLocalisation.h"
 #include "hardware/RDA5802.h"
 
-static menuStatus_t menuRSSIExitCode = MENU_STATUS_SUCCESS;
+static menuStatus_t menuFMRadioExitCode = MENU_STATUS_SUCCESS;
 static void updateScreen(bool forceRedraw, bool firstRun);
 static void handleEvent(uiEvent_t *ev);
 
@@ -24,13 +24,16 @@ menuStatus_t menuFMradio(uiEvent_t *ev, bool isFirstRun)
 		if (initialize_rda5802())
 		{
 			enable_rda5802();
+
+			// Set initial frequency
 			set_freq_rda5802(9790);
 		}
-		updateScreen(true, true);
+
+		//updateScreen(true, true);
 	}
 	else
 	{
-		menuRSSIExitCode = MENU_STATUS_SUCCESS;
+		menuFMRadioExitCode = MENU_STATUS_SUCCESS;
 		if (ev->hasEvent)
 		{
 			handleEvent(ev);
@@ -43,7 +46,7 @@ menuStatus_t menuFMradio(uiEvent_t *ev, bool isFirstRun)
 		}
 	}
 
-	return menuRSSIExitCode;
+	return menuFMRadioExitCode;
 }
 
 static void updateScreen(bool forceRedraw, bool isFirstRun)
@@ -55,7 +58,7 @@ static void updateScreen(bool forceRedraw, bool isFirstRun)
 
 	char buffer[16] = {0};
 	snprintf(buffer, SCREEN_LINE_BUFFER_SIZE, "%3d.%02d%s", freq / 100, freq % 100, "MHz");
-	ucPrintCentered(DISPLAY_Y_POS_RSSI_VALUE, buffer, FONT_SIZE_3);
+	ucPrintCentered(DISPLAY_Y_POS_RSSI_VALUE, buffer, FONT_SIZE_4);
 
 	ucRender();
 }
@@ -86,5 +89,32 @@ static void handleEvent(uiEvent_t *ev)
 	{
 		start_seek(false);
 	}
+	else if (KEYCHECK_SHORTUP(ev->keys, KEY_UP))
+	{
+		uint16_t freq;
 
+		stop_seek(true);
+		freq = get_freq_rda5802();
+
+		freq += 10;
+		if (freq >= 10800)
+		{
+			freq = 10800;
+		}
+		set_freq_rda5802(freq);
+	}
+	else if (KEYCHECK_SHORTUP(ev->keys, KEY_DOWN))
+	{
+		uint16_t freq;
+
+		stop_seek(true);
+		freq = get_freq_rda5802();
+
+		freq -= 10;
+		if (freq <= 8700)
+		{
+			freq = 8700;
+		}
+		set_freq_rda5802(freq);
+	}
 }

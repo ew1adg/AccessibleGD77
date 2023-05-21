@@ -73,6 +73,7 @@ bool initialize_rda5802();
 void enable_rda5802();
 void disable_rda5802();
 void start_seek(bool seekup);
+void stop_seek();
 void set_freq_rda5802(uint16_t freq);
 uint16_t get_freq_rda5802();
 uint16_t get_rssi_rda5802();

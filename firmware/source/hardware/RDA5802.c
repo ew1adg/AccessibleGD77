@@ -74,7 +74,16 @@ void start_seek(bool seekup)
     } else {
     	rda5802_regs[0] &= ~RDA5802_SEEKUP;
     }
+
     RDA5802BatchWrite(rda5802_regs);
+
+    rda5802_regs[0] &= ~RDA580X_SEEK;
+}
+
+void stop_seek()
+{
+	//rda5802_regs[0] &= ~RDA580X_SEEK;
+	RDA5802BatchWrite(rda5802_regs);
 }
 
 void set_freq_rda5802(uint16_t freq)
@@ -87,6 +96,9 @@ void set_freq_rda5802(uint16_t freq)
     rda5802_regs[3] = ((chan & 0x03) << 6) | RDA5802_TUNE | RDA5802_BAND_US_EUROPE | RDA5802_STEP_100;
 
     RDA5802BatchWrite(rda5802_regs);
+
+    // Reset tune flag
+    rda5802_regs[3] &= ~RDA5802_TUNE;
 }
 
 /* Get actual frequency value. Multiply by 10 to get value in KHz */
